@@ -17,6 +17,34 @@ public class UserService {
     @Inject
     UserBean userBean;
 
+    // Get token timer(Session Timeout)
+    @GET
+    @Path("/tokenTimer")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTokenTimer(@HeaderParam("token") String token) {
+        if (userBean.tokenExist(token)) {
+            int tokenTimer = userBean.getTokenTimer();
+            return Response.status(200).entity(tokenTimer).build();
+        } else {
+            userBean.logout(token);
+            return Response.status(401).entity("Invalid Token!").build();
+        }
+    }
+
+    // Change token timer(Session Timeout)
+    @PUT
+    @Path("/tokenTimer")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateTokenTimer(@HeaderParam("token") String token, int tokenTimer) {
+        if (userBean.tokenExist(token)) {
+            userBean.setTokenTimer(tokenTimer, token);
+            return Response.status(200).build();
+        } else {
+            userBean.logout(token);
+            return Response.status(401).entity("Invalid Token!").build();
+        }
+    }
+
     // Makes Login (Return token)
     @POST
     @Path("/login")
@@ -29,8 +57,7 @@ public class UserService {
         LoginDto login = userBean.login(username, password);
         if (login != null) {
             return Response.status(200).entity(login).build();
-        }
-        else return Response.status(403).entity("Wrong Username or Password! Please try again.").build();
+        } else return Response.status(403).entity("Wrong Username or Password! Please try again.").build();
     }
 
     // Register new user

@@ -33,6 +33,22 @@ public class UserBean implements Serializable {
 
     int tokenTimer = 1000000;
 
+    public int getTokenTimer() {
+        return tokenTimer;
+    }
+
+    public void setTokenTimer(int tokenTimer, String token) {
+        // Get user role by token
+        UserEntity userEntity = userDao.findUserByToken(token);
+        if (userEntity != null) {
+            UserRole userRole = userEntity.getRole();
+            // Check if the user is not a DEVELOPER or SCRUM_MASTER
+            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
+                this.tokenTimer = tokenTimer;
+            }
+        }
+    }
+
     public LoginDto login(String username, String password) {
         LoginDto successLogin = new LoginDto();
         UserEntity userEntity = userDao.findUserByUsername(username);
@@ -213,7 +229,7 @@ public class UserBean implements Serializable {
             UserRole userRole = userEntity.getRole();
             // Check if the user is not a DEVELOPER or SCRUM_MASTER: cannot change user role
             if (userRole == UserRole.DEVELOPER || userRole == UserRole.SCRUM_MASTER) {
-            return false;
+                return false;
             }
             UserEntity u = userDao.findUserById(user.getId());
             if (u != null) {
