@@ -21,7 +21,7 @@ import paj.project5_vc.entity.ConfigurationEntity;
             } catch (NoResultException e) {
                 // Handle if no configuration is found
                 ConfigurationEntity defaultConfig = new ConfigurationEntity();
-                defaultConfig.setTokenTimer(10000); // Provide a default value
+                defaultConfig.setTokenTimer(10); // Provide a default value
                 persist(defaultConfig);
                 return defaultConfig;
             }

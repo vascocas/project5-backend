@@ -9,7 +9,7 @@ public class UserManagmentDto {
 
 
     @XmlElement
-    private int userId;
+    private int id;
     @XmlElement
     private String username;
     @XmlElement
@@ -20,19 +20,19 @@ public class UserManagmentDto {
     public UserManagmentDto() {
     }
 
-    public UserManagmentDto(int userId, String username, UserRole role, boolean deleted) {
-        this.userId = userId;
+    public UserManagmentDto(int id, String username, UserRole role, boolean deleted) {
+        this.id = id;
         this.username = username;
         this.role = role;
         this.deleted = deleted;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getId() {
+        return id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUsername() {

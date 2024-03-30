@@ -71,7 +71,7 @@ public class UserBean implements Serializable {
                 tokenEntity.setTokenValue(tokenValue);
                 tokenEntity.setUser(userEntity);
                 ConfigurationEntity timer = configDao.findTokenTimer();
-                tokenEntity.setTokenExpiration(Instant.now().plus(timer.getTokenTimer(), ChronoUnit.SECONDS));
+                tokenEntity.setTokenExpiration(Instant.now().plus(timer.getTokenTimer(), ChronoUnit.MINUTES));
                 tokenDao.persist(tokenEntity);
                 successLogin.setToken(tokenValue);
                 successLogin.setRole(userEntity.getRole());
@@ -127,7 +127,7 @@ public class UserBean implements Serializable {
         TokenEntity t = tokenDao.findTokenByValue(token);
         if (u != null && isTokenValid(t)) {
             ConfigurationEntity timer = configDao.findTokenTimer();
-            t.setTokenExpiration(Instant.now().plus(timer.getTokenTimer(), ChronoUnit.SECONDS));
+            t.setTokenExpiration(Instant.now().plus(timer.getTokenTimer(), ChronoUnit.MINUTES));
             return true;
         } else {
             return false;
@@ -301,7 +301,7 @@ public class UserBean implements Serializable {
                     ArrayList<UserManagmentDto> usersManagmentDtos = new ArrayList<>();
                     for (UserEntity user : userList) {
                         UserManagmentDto userManagmentDto = new UserManagmentDto();
-                        userManagmentDto.setUserId(user.getId());
+                        userManagmentDto.setId(user.getId());
                         userManagmentDto.setUsername(user.getUsername());
                         userManagmentDto.setRole(user.getRole());
                         userManagmentDto.setDeleted(user.isDeleted());
