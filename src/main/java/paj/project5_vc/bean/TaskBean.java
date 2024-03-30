@@ -14,7 +14,9 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.time.temporal.ChronoUnit;
 
 
 @Stateless
@@ -231,10 +233,25 @@ public class TaskBean implements Serializable {
     public boolean updateTaskStatus(TaskStateDto newStatus) {
         TaskEntity t = taskDao.findTaskById(newStatus.getId());
         if (t != null) {
-            t.setState(newStatus.getState());
+            TaskState currentState = t.getState();
+            TaskState newState = newStatus.getState();
+            // Check if the task is transitioning to the DONE state
+            if (currentState == TaskState.DOING && newState == TaskState.DONE) {
+                t.setCompletedDate(LocalDate.now()); // Set the completion date
+            }
+            t.setState(newState); // Update the task state
             return true;
         }
         return false;
+    }
+
+    public long calculateTaskCompletionTime(TaskEntity task) {
+        if (task.getStartDate() != null && task.getCompletedDate() != null) {
+            return ChronoUnit.DAYS.between(task.getStartDate(), task.getCompletedDate());
+        } else {
+            // Handle case where timestamps are not set
+            return -1; // or throw an exception
+        }
     }
 
     private TaskDto convertTaskFromEntityToDto(TaskEntity t) {
@@ -248,10 +265,9 @@ public class TaskBean implements Serializable {
         taskDto.setPriority(t.getPriority());
         taskDto.setDeleted(t.isDeleted());
         taskDto.setCategory(t.getCategory().getCategoryName());
-        if(t.getCreator()==null){
+        if (t.getCreator() == null) {
             taskDto.setCreator(null);
-        }
-        else {
+        } else {
             taskDto.setCreator(t.getCreator().getUsername());
         }
         return taskDto;

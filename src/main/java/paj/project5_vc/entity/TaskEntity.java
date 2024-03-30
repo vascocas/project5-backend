@@ -35,6 +35,9 @@ public class TaskEntity implements Serializable {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Column(name = "duration")
+    private LocalDate completedDate;
+
     @Column(name = "state", nullable = false)
     private int state;
 
@@ -93,6 +96,14 @@ public class TaskEntity implements Serializable {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public LocalDate getCompletedDate() {
+        return completedDate;
+    }
+
+    public void setCompletedDate(LocalDate completedDate) {
+        this.completedDate = completedDate;
     }
 
     public TaskState getState() {

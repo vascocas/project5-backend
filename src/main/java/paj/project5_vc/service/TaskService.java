@@ -224,7 +224,7 @@ public class TaskService {
         }
         // Set default state if not provided or invalid
         if (newStatus.getState() == null || !isValidState(newStatus.getState())) {
-            newStatus.setState(TaskState.TODO);
+            return Response.status(400).entity("Invalid state").build();
         }
         if (taskBean.updateTaskStatus(newStatus)) {
             return Response.status(200).entity("Task status updated successfully").build();
