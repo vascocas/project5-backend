@@ -20,11 +20,12 @@ public class UserService {
     // Get token timer(Session Timeout)
     @GET
     @Path("/tokenTimer")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTokenTimer(@HeaderParam("token") String token) {
+    public Response getTokenTimerValue(@HeaderParam("token") String token) {
         if (userBean.tokenExist(token)) {
-            int tokenTimer = userBean.getTokenTimer();
-            return Response.status(200).entity(tokenTimer).build();
+            TokenDto tokenDto = userBean.getTokenTimer();
+                return Response.status(200).entity(tokenDto).build();
         } else {
             userBean.logout(token);
             return Response.status(401).entity("Invalid Token!").build();
@@ -35,10 +36,13 @@ public class UserService {
     @PUT
     @Path("/tokenTimer")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateTokenTimer(@HeaderParam("token") String token, int tokenTimer) {
+    public Response updateTokenTimer(@HeaderParam("token") String token, TokenDto tokenTimer) {
         if (userBean.tokenExist(token)) {
-            userBean.setTokenTimer(tokenTimer, token);
-            return Response.status(200).build();
+            if (userBean.setTokenTimer(token, tokenTimer)) {
+                return Response.status(200).entity("Token Timer updated!").build();
+            } else {
+                return Response.status(403).entity("Unauthorized").build();
+            }
         } else {
             userBean.logout(token);
             return Response.status(401).entity("Invalid Token!").build();
@@ -147,14 +151,14 @@ public class UserService {
         return Response.status(200).entity(usernames).build();
     }
 
-    // Get list of active users (User dto)
+    // Get list of active users (UserManagment dto)
     @GET
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers(@HeaderParam("token") String token) {
         if (userBean.tokenExist(token)) {
-            ArrayList<UserDto> users = userBean.getAllUsers(token);
+            ArrayList<UserManagmentDto> users = userBean.getAllUsers(token);
             if (users != null) {
                 return Response.status(200).entity(users).build();
             } else {

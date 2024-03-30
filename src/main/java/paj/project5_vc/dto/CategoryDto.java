@@ -1,10 +1,10 @@
 package paj.project5_vc.dto;
 
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class CategoryDto {
-
-    private static final long serialVersionUID = 1L;
 
     @XmlElement
     private int id;

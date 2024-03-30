@@ -7,8 +7,6 @@ import paj.project5_vc.enums.UserRole;
 @XmlRootElement
 public class LoginDto {
 
-    private static final long serialVersionUID = 1L;
-
     @XmlElement
     private String username;
     @XmlElement

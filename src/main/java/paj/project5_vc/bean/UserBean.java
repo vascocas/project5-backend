@@ -1,9 +1,10 @@
 package paj.project5_vc.bean;
 
-
+import paj.project5_vc.dao.ConfigurationDao;
 import paj.project5_vc.dao.TokenDao;
 import paj.project5_vc.dao.UserDao;
 import paj.project5_vc.dto.*;
+import paj.project5_vc.entity.ConfigurationEntity;
 import paj.project5_vc.entity.TaskEntity;
 import paj.project5_vc.entity.TokenEntity;
 import paj.project5_vc.entity.UserEntity;
@@ -17,6 +18,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Set;
 
 
 @Stateless
@@ -29,24 +31,31 @@ public class UserBean implements Serializable {
     @EJB
     TokenDao tokenDao;
     @EJB
+    ConfigurationDao configDao;
+    @EJB
     PassEncoder passEncoder;
 
-    int tokenTimer = 1000000;
 
-    public int getTokenTimer() {
-        return tokenTimer;
+    public TokenDto getTokenTimer() {
+        ConfigurationEntity timer = configDao.findTokenTimer();
+        TokenDto tokenDto = new TokenDto();
+        tokenDto.setTimer(timer.getTokenTimer());
+        return tokenDto;
     }
 
-    public void setTokenTimer(int tokenTimer, String token) {
+    public boolean setTokenTimer(String token, TokenDto tokenTimer) {
         // Get user role by token
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
             // Check if the user is not a DEVELOPER or SCRUM_MASTER
             if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
-                this.tokenTimer = tokenTimer;
+                ConfigurationEntity timer = configDao.findTokenTimer();
+                timer.setTokenTimer(tokenTimer.getTimer());
+                return true;
             }
         }
+        return false;
     }
 
     public LoginDto login(String username, String password) {
@@ -61,7 +70,8 @@ public class UserBean implements Serializable {
                 TokenEntity tokenEntity = new TokenEntity();
                 tokenEntity.setTokenValue(tokenValue);
                 tokenEntity.setUser(userEntity);
-                tokenEntity.setTokenExpiration(Instant.now().plus(tokenTimer, ChronoUnit.SECONDS));
+                ConfigurationEntity timer = configDao.findTokenTimer();
+                tokenEntity.setTokenExpiration(Instant.now().plus(timer.getTokenTimer(), ChronoUnit.SECONDS));
                 tokenDao.persist(tokenEntity);
                 successLogin.setToken(tokenValue);
                 successLogin.setRole(userEntity.getRole());
@@ -116,7 +126,8 @@ public class UserBean implements Serializable {
         UserEntity u = userDao.findUserByToken(token);
         TokenEntity t = tokenDao.findTokenByValue(token);
         if (u != null && isTokenValid(t)) {
-            t.setTokenExpiration(Instant.now().plus(tokenTimer, ChronoUnit.SECONDS));
+            ConfigurationEntity timer = configDao.findTokenTimer();
+            t.setTokenExpiration(Instant.now().plus(timer.getTokenTimer(), ChronoUnit.SECONDS));
             return true;
         } else {
             return false;
@@ -228,9 +239,9 @@ public class UserBean implements Serializable {
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
             // Check if the user is not a DEVELOPER or SCRUM_MASTER: cannot change user role
-            if (userRole == UserRole.DEVELOPER || userRole == UserRole.SCRUM_MASTER) {
-                return false;
-            }
+            // if (userRole == UserRole.DEVELOPER || userRole == UserRole.SCRUM_MASTER) {
+            //    return false;
+            //}
             UserEntity u = userDao.findUserById(user.getId());
             if (u != null) {
                 u.setRole(user.getRole());
@@ -279,18 +290,25 @@ public class UserBean implements Serializable {
         return null;
     }
 
-    public ArrayList<UserDto> getAllUsers(String token) {
+    public ArrayList<UserManagmentDto> getAllUsers(String token) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
-            // Check if the user is a DEVELOPER or SCRUM_MASTER: cannot get all users list
-            if (userRole == UserRole.DEVELOPER || userRole == UserRole.SCRUM_MASTER) {
-                return null;
-            }
-            ArrayList<UserEntity> userList = userDao.findAllActiveUsers();
-            if (userList != null) {
-                ArrayList<UserDto> users = convertUsersFromEntityListToUserDtoList(userList);
-                return users;
+            // Check if the user isn't a DEVELOPER or SCRUM_MASTER: cannot get all users list
+            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
+                ArrayList<UserEntity> userList = userDao.findAllActiveUsers();
+                if (userList != null) {
+                    ArrayList<UserManagmentDto> usersManagmentDtos = new ArrayList<>();
+                    for (UserEntity user : userList) {
+                        UserManagmentDto userManagmentDto = new UserManagmentDto();
+                        userManagmentDto.setUserId(user.getId());
+                        userManagmentDto.setUsername(user.getUsername());
+                        userManagmentDto.setRole(user.getRole());
+                        userManagmentDto.setDeleted(user.isDeleted());
+                        usersManagmentDtos.add(userManagmentDto);
+                    }
+                    return usersManagmentDtos;
+                }
             }
         }
         return null;

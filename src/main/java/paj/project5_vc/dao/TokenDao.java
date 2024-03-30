@@ -3,6 +3,9 @@ package paj.project5_vc.dao;
 import paj.project5_vc.entity.TokenEntity;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
+import paj.project5_vc.entity.UserEntity;
+
+import java.util.ArrayList;
 
 @Stateless
 public class TokenDao extends AbstractDao<TokenEntity> {
@@ -22,4 +25,5 @@ public class TokenDao extends AbstractDao<TokenEntity> {
             return null;
         }
     }
+
 }

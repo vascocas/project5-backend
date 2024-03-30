@@ -1,11 +1,11 @@
 package paj.project5_vc.dto;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import paj.project5_vc.enums.TaskState;
 import jakarta.xml.bind.annotation.XmlElement;
 
+@XmlRootElement
 public class TaskStateDto {
-
-    private static final long serialVersionUID = 1L;
 
     @XmlElement
     private int id;

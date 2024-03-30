@@ -5,30 +5,34 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import paj.project5_vc.enums.UserRole;
 
 @XmlRootElement
-public class RoleDto {
+public class UserManagmentDto {
+
 
     @XmlElement
-    private int id;
+    private int userId;
     @XmlElement
     private String username;
     @XmlElement
     private UserRole role;
+    @XmlElement
+    private boolean deleted;
 
-    public RoleDto() {
+    public UserManagmentDto() {
     }
 
-    public RoleDto(int id, String username, UserRole role) {
-        this.id = id;
+    public UserManagmentDto(int userId, String username, UserRole role, boolean deleted) {
+        this.userId = userId;
         this.username = username;
         this.role = role;
+        this.deleted = deleted;
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
@@ -46,4 +50,13 @@ public class RoleDto {
     public void setRole(UserRole role) {
         this.role = role;
     }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
 }

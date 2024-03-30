@@ -11,8 +11,6 @@ import java.time.LocalDate;
 @XmlRootElement
 public class TaskDto {
 
-    private static final long serialVersionUID = 1L;
-
     @XmlElement
     private int id;
     @XmlElement

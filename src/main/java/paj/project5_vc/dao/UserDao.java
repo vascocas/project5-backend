@@ -62,6 +62,7 @@ public class UserDao extends AbstractDao<UserEntity> {
             return null;
         }
     }
+
     public ArrayList<UserEntity> findAllDeletedUsers() {
         try {
             ArrayList<UserEntity> activeUsers = (ArrayList<UserEntity>) em.createNamedQuery("User.findAllDeletedUsers")
