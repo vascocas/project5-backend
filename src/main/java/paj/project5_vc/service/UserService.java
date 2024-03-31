@@ -156,9 +156,17 @@ public class UserService {
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers(@HeaderParam("token") String token) {
+    public Response getAllUsers(@HeaderParam("token") String token, @QueryParam("role") String role, @QueryParam("order") String order) {
         if (userBean.tokenExist(token)) {
-            ArrayList<UserManagmentDto> users = userBean.getAllUsers(token);
+            ArrayList<UserManagmentDto> users;
+            if (role != null && !role.isEmpty()) {
+                // If role parameter is provided, filter users by role
+                users = userBean.getUsersByRole(token, role, order);
+            } else {
+                // Otherwise, get all users
+                users = userBean.getAllUsers(token);
+            }
+
             if (users != null) {
                 return Response.status(200).entity(users).build();
             } else {
@@ -170,14 +178,14 @@ public class UserService {
         }
     }
 
-    // Get list of deleted users (User dto)
+    // Get list of deleted users (UserManagment dto)
     @GET
     @Path("/deletedUsers")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllDeletedUsers(@HeaderParam("token") String token) {
         if (userBean.tokenExist(token)) {
-            ArrayList<UserDto> users = userBean.getDeletedUsers(token);
+            ArrayList<UserManagmentDto> users = userBean.getDeletedUsers(token);
             if (users != null) {
                 return Response.status(200).entity(users).build();
             } else {

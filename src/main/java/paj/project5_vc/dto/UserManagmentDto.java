@@ -15,16 +15,16 @@ public class UserManagmentDto {
     @XmlElement
     private UserRole role;
     @XmlElement
-    private boolean deleted;
+    private String email;
 
     public UserManagmentDto() {
     }
 
-    public UserManagmentDto(int id, String username, UserRole role, boolean deleted) {
+    public UserManagmentDto(int id, String username, UserRole role, String email) {
         this.id = id;
         this.username = username;
         this.role = role;
-        this.deleted = deleted;
+        this.email = email;
     }
 
     public int getId() {
@@ -51,12 +51,11 @@ public class UserManagmentDto {
         this.role = role;
     }
 
-    public boolean isDeleted() {
-        return deleted;
+    public String getEmail() {
+        return email;
     }
 
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public void setEmail(String email) {
+        this.email = email;
     }
-
 }

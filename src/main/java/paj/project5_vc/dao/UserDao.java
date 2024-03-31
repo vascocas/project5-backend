@@ -3,6 +3,7 @@ package paj.project5_vc.dao;
 import paj.project5_vc.entity.UserEntity;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
+import paj.project5_vc.enums.UserRole;
 
 import java.util.ArrayList;
 
@@ -72,6 +73,21 @@ public class UserDao extends AbstractDao<UserEntity> {
             return null;
         }
     }
+
+    public ArrayList<UserEntity> findUsersByRole(String role, String order) {
+        try {
+            // Convert the role String to UserRole enum
+            UserRole userRole = UserRole.valueOf(role.toUpperCase());
+            ArrayList<UserEntity> usersByRole = (ArrayList<UserEntity>) em.createNamedQuery("User.findUsersByRole")
+                    .setParameter("role", userRole)
+                    .setParameter("order", order)
+                    .getResultList();
+            return usersByRole;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }
 
 

@@ -298,23 +298,29 @@ public class UserBean implements Serializable {
             if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
                 ArrayList<UserEntity> userList = userDao.findAllActiveUsers();
                 if (userList != null) {
-                    ArrayList<UserManagmentDto> usersManagmentDtos = new ArrayList<>();
-                    for (UserEntity user : userList) {
-                        UserManagmentDto userManagmentDto = new UserManagmentDto();
-                        userManagmentDto.setId(user.getId());
-                        userManagmentDto.setUsername(user.getUsername());
-                        userManagmentDto.setRole(user.getRole());
-                        userManagmentDto.setDeleted(user.isDeleted());
-                        usersManagmentDtos.add(userManagmentDto);
-                    }
-                    return usersManagmentDtos;
+                    return convertUsersFromEntityToUserManagmentDtoList(userList);
                 }
             }
         }
         return null;
     }
 
-    public ArrayList<UserDto> getDeletedUsers(String token) {
+    public ArrayList<UserManagmentDto> getUsersByRole(String token, String role, String order) {
+        UserEntity userEntity = userDao.findUserByToken(token);
+        if (userEntity != null) {
+            UserRole userRole = userEntity.getRole();
+            // Check if the user isn't a DEVELOPER or SCRUM_MASTER: cannot get all users list
+            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
+                ArrayList<UserEntity> userList = userDao.findUsersByRole(role, order);
+                if (userList != null) {
+                    return convertUsersFromEntityToUserManagmentDtoList(userList);
+                }
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<UserManagmentDto> getDeletedUsers(String token) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
@@ -324,8 +330,7 @@ public class UserBean implements Serializable {
             }
             ArrayList<UserEntity> userDeletedList = userDao.findAllDeletedUsers();
             if (userDeletedList != null) {
-                ArrayList<UserDto> deletedUsers = convertUsersFromEntityListToUserDtoList(userDeletedList);
-                return deletedUsers;
+                return convertUsersFromEntityToUserManagmentDtoList(userDeletedList);
             }
         }
         return null;
@@ -437,5 +442,19 @@ public class UserBean implements Serializable {
             roleDtos.add(roleDto);
         }
         return roleDtos;
+    }
+
+    private ArrayList<UserManagmentDto> convertUsersFromEntityToUserManagmentDtoList
+            (ArrayList<UserEntity> userEntityEntities) {
+        ArrayList<UserManagmentDto> usersDtos = new ArrayList<>();
+        for (UserEntity u : userEntityEntities) {
+            UserManagmentDto userDto = new UserManagmentDto();
+            userDto.setId(u.getId());
+            userDto.setUsername(u.getUsername());
+            userDto.setRole(u.getRole());
+            userDto.setEmail(u.getEmail());
+            usersDtos.add(userDto);
+        }
+        return usersDtos;
     }
 }
