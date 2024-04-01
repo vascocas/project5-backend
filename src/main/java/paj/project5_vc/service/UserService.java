@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import paj.project5_vc.enums.UserRole;
 
 import java.util.ArrayList;
 
@@ -25,7 +26,7 @@ public class UserService {
     public Response getTokenTimerValue(@HeaderParam("token") String token) {
         if (userBean.tokenExist(token)) {
             TokenDto tokenDto = userBean.getTokenTimer();
-                return Response.status(200).entity(tokenDto).build();
+            return Response.status(200).entity(tokenDto).build();
         } else {
             userBean.logout(token);
             return Response.status(401).entity("Invalid Token!").build();
@@ -156,25 +157,29 @@ public class UserService {
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers(@HeaderParam("token") String token, @QueryParam("role") String role, @QueryParam("order") String order) {
-        if (userBean.tokenExist(token)) {
-            ArrayList<UserManagmentDto> users;
-            if (role != null && !role.isEmpty()) {
-                // If role parameter is provided, filter users by role
-                users = userBean.getUsersByRole(token, role, order);
-            } else {
-                // Otherwise, get all users
-                users = userBean.getAllUsers(token);
-            }
-
-            if (users != null) {
-                return Response.status(200).entity(users).build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
-        } else {
+    public Response getAllUsers(@HeaderParam("token") String token, @QueryParam("role") UserRole role,
+                                @QueryParam("order") String order,
+                                @QueryParam("page") int page,
+                                @QueryParam("pageSize") int pageSize) {
+        if (!userBean.tokenExist(token)) {
             userBean.logout(token);
             return Response.status(401).entity("Invalid Token!").build();
+        }
+        // Define default values if page number and page size <= 0
+        if (page <= 0) {
+            page = 1;
+        }
+        if (pageSize <= 0) {
+            pageSize = 5;
+        }
+        // Calculate the offset based on the page number and page size
+        int offset = (page - 1) * pageSize;
+        // Call the getUsers method in your bean with pagination parameters
+        ArrayList<UserManagmentDto> users = userBean.getUsers(token, role, order, offset, pageSize);
+        if (users != null) {
+            return Response.status(200).entity(users).build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
         }
     }
 

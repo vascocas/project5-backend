@@ -54,8 +54,9 @@ public class UserDao extends AbstractDao<UserEntity> {
         }
     }
 
-    public ArrayList<UserEntity> findAllActiveUsers() {
+    public ArrayList<UserEntity> findAllActiveUsernames() {
         try {
+            // Apply pagination using the offset and pageSize parameters
             ArrayList<UserEntity> activeUsers = (ArrayList<UserEntity>) em.createNamedQuery("User.findAllActiveUsers")
                     .getResultList();
             return activeUsers;
@@ -63,6 +64,22 @@ public class UserDao extends AbstractDao<UserEntity> {
             return null;
         }
     }
+
+
+    public ArrayList<UserEntity> findAllActiveUsers(String order, int offset, int pageSize) {
+        try {
+            // Apply pagination using the offset and pageSize parameters
+            ArrayList<UserEntity> activeUsers = (ArrayList<UserEntity>) em.createNamedQuery("User.findAllActiveUsers")
+                    .setParameter("order", order)
+                    .setFirstResult(offset) // Set the offset
+                    .setMaxResults(pageSize) // Set the max number of results to fetch
+                    .getResultList();
+            return activeUsers;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
     public ArrayList<UserEntity> findAllDeletedUsers() {
         try {
@@ -74,13 +91,15 @@ public class UserDao extends AbstractDao<UserEntity> {
         }
     }
 
-    public ArrayList<UserEntity> findUsersByRole(String role, String order) {
+    public ArrayList<UserEntity> findUsersByRole(UserRole role, String order, int offset, int pageSize) {
         try {
-            // Convert the role String to UserRole enum
-            UserRole userRole = UserRole.valueOf(role.toUpperCase());
+            // Convert the UserRole enum to int
+            int intRole = role.getValue();
             ArrayList<UserEntity> usersByRole = (ArrayList<UserEntity>) em.createNamedQuery("User.findUsersByRole")
-                    .setParameter("role", userRole)
+                    .setParameter("role", intRole)
                     .setParameter("order", order)
+                    .setFirstResult(offset) // Set the offset
+                    .setMaxResults(pageSize) // Set the max number of results to fetch
                     .getResultList();
             return usersByRole;
         } catch (Exception e) {

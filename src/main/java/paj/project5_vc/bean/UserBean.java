@@ -262,7 +262,7 @@ public class UserBean implements Serializable {
     }
 
     public ArrayList<RoleDto> getAllUsernames() {
-        ArrayList<UserEntity> users = userDao.findAllActiveUsers();
+        ArrayList<UserEntity> users = userDao.findAllActiveUsernames();
         if (users != null && !users.isEmpty()) {
             return convertUsersFromEntityListToRoleDtoList(users);
         } else {
@@ -290,13 +290,20 @@ public class UserBean implements Serializable {
         return null;
     }
 
-    public ArrayList<UserManagmentDto> getAllUsers(String token) {
+    public ArrayList<UserManagmentDto> getUsers(String token, UserRole role, String order, int offset, int pageSize) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
             // Check if the user isn't a DEVELOPER or SCRUM_MASTER: cannot get all users list
             if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
-                ArrayList<UserEntity> userList = userDao.findAllActiveUsers();
+                ArrayList<UserEntity> userList;
+                // Check if there is a filter parameter defined for role
+                if (role == UserRole.DEVELOPER || role == UserRole.SCRUM_MASTER || role == UserRole.PRODUCT_OWNER) {
+                    // Apply pagination parameters to the query
+                    userList = userDao.findUsersByRole(role, order, offset, pageSize);
+                } else {
+                    userList = userDao.findAllActiveUsers(order, offset, pageSize);
+                }
                 if (userList != null) {
                     return convertUsersFromEntityToUserManagmentDtoList(userList);
                 }
@@ -305,20 +312,7 @@ public class UserBean implements Serializable {
         return null;
     }
 
-    public ArrayList<UserManagmentDto> getUsersByRole(String token, String role, String order) {
-        UserEntity userEntity = userDao.findUserByToken(token);
-        if (userEntity != null) {
-            UserRole userRole = userEntity.getRole();
-            // Check if the user isn't a DEVELOPER or SCRUM_MASTER: cannot get all users list
-            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
-                ArrayList<UserEntity> userList = userDao.findUsersByRole(role, order);
-                if (userList != null) {
-                    return convertUsersFromEntityToUserManagmentDtoList(userList);
-                }
-            }
-        }
-        return null;
-    }
+
 
     public ArrayList<UserManagmentDto> getDeletedUsers(String token) {
         UserEntity userEntity = userDao.findUserByToken(token);
