@@ -172,10 +172,8 @@ public class UserService {
         if (pageSize <= 0) {
             pageSize = 5;
         }
-        // Calculate the offset based on the page number and page size
-        int offset = (page - 1) * pageSize;
         // Call the getUsers method in your bean with pagination parameters
-        ArrayList<UserManagmentDto> users = userBean.getUsers(token, role, order, offset, pageSize);
+        UserTable users = userBean.getUsers(token, role, order, page, pageSize);
         if (users != null) {
             return Response.status(200).entity(users).build();
         } else {

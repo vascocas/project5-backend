@@ -290,29 +290,37 @@ public class UserBean implements Serializable {
         return null;
     }
 
-    public ArrayList<UserManagmentDto> getUsers(String token, UserRole role, String order, int offset, int pageSize) {
+    public UserTable getUsers(String token, UserRole role, String order, int page, int pageSize) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
             // Check if the user isn't a DEVELOPER or SCRUM_MASTER: cannot get all users list
             if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
                 ArrayList<UserEntity> userList;
+                int totalItems;
+                // Calculate the offset based on the page number and page size
+                int offset = (page - 1) * pageSize;
                 // Check if there is a filter parameter defined for role
                 if (role == UserRole.DEVELOPER || role == UserRole.SCRUM_MASTER || role == UserRole.PRODUCT_OWNER) {
                     // Apply pagination parameters to the query
                     userList = userDao.findUsersByRole(role, order, offset, pageSize);
+                    // Get the total count of users
+                    totalItems = userDao.findTotalUsersCountByRole(role);
                 } else {
                     userList = userDao.findAllActiveUsers(order, offset, pageSize);
+                    // Get the total count of users
+                    totalItems = userDao.findTotalUserCountbyActive();
                 }
                 if (userList != null) {
-                    return convertUsersFromEntityToUserManagmentDtoList(userList);
+                    // Get the total number of pages based on the total items and page size
+                    int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+                    // Create and return the response object with users, total items, total pages, current page, and page size
+                    return new UserTable(convertUsersFromEntityToUserManagmentDtoList(userList), totalItems, totalPages, page, pageSize);
                 }
             }
         }
         return null;
     }
-
-
 
     public ArrayList<UserManagmentDto> getDeletedUsers(String token) {
         UserEntity userEntity = userDao.findUserByToken(token);

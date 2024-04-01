@@ -1,5 +1,6 @@
 package paj.project5_vc.dao;
 
+import jakarta.persistence.Query;
 import paj.project5_vc.entity.UserEntity;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
@@ -80,6 +81,28 @@ public class UserDao extends AbstractDao<UserEntity> {
         }
     }
 
+    // Method to count total active users
+    public int findTotalUserCountbyActive() {
+        try {
+            Long count = (Long) em.createNamedQuery("User.findTotalActiveUserCount")
+                    .getSingleResult();
+            return count.intValue();
+        } catch (Exception e) {
+            // Handle any exceptions
+            return -1; // Or return any appropriate default value
+        }
+    }
+
+    public int findTotalPagesActiveUserCount(int pageSize) {
+        try {
+            Long totalPages = (Long) em.createNamedQuery("User.findTotalPagesActiveUserCount")
+                    .setParameter("pageSize", pageSize)
+                    .getSingleResult();
+            return totalPages != null ? totalPages.intValue() : 0;
+        } catch (Exception e) {
+            return 0; // Handle any exceptions appropriately
+        }
+    }
 
     public ArrayList<UserEntity> findAllDeletedUsers() {
         try {
@@ -104,6 +127,32 @@ public class UserDao extends AbstractDao<UserEntity> {
             return usersByRole;
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    // Method to count total users by role
+    public int findTotalUsersCountByRole(UserRole role) {
+        try {
+            int intRole = role.getValue();
+            Long count = (Long) em.createNamedQuery("User.findTotalUsersCountByRole")
+                    .setParameter("role", intRole)
+                    .getSingleResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            return 0; // Handle any exceptions appropriately
+        }
+    }
+
+    public int findTotalPagesCountByRole(UserRole role, int pageSize) {
+        try {
+            int intRole = role.getValue();
+            Long totalPages = (Long) em.createNamedQuery("User.findTotalPagesCountByRole")
+                    .setParameter("role", intRole)
+                    .setParameter("pageSize", pageSize)
+                    .getSingleResult();
+            return totalPages != null ? totalPages.intValue() : 0;
+        } catch (Exception e) {
+            return 0; // Handle any exceptions appropriately
         }
     }
 
