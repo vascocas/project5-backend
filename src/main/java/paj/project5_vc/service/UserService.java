@@ -123,21 +123,6 @@ public class UserService {
         }
     }
 
-    // Get logged user
-    @GET
-    @Path("/loggedUser")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response userByToken(@HeaderParam("token") String token) {
-        if (userBean.tokenExist(token)) {
-            UserDto dto = userBean.userByToken(token);
-            return Response.status(200).entity(dto).build();
-        } else {
-            userBean.logout(token);
-            return Response.status(401).entity("Invalid Token!").build();
-        }
-    }
-
     // Get list of usernames (Role dto)
     @GET
     @Path("/usernames")
@@ -207,12 +192,8 @@ public class UserService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProfile(@HeaderParam("token") String token, @QueryParam("username") String username) {
         if (userBean.tokenExist(token)) {
-            UserDto user = userBean.getProfile(username, token);
-            if (user != null) {
+            UserDto user = userBean.getProfile(username);
                 return Response.status(200).entity(user).build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
         } else {
             userBean.logout(token);
             return Response.status(401).entity("Invalid Token!").build();

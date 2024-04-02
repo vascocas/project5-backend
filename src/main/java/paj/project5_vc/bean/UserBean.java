@@ -142,27 +142,13 @@ public class UserBean implements Serializable {
         } else return new UserDto();
     }
 
-
-    public UserDto userByToken(String token) {
-        UserEntity u = userDao.findUserByToken(token);
-        if (u != null) {
-            UserDto dto = convertUserEntitytoUserDto(u);
-            return dto;
-        } else return new UserDto();
-    }
-
-    public UserDto getProfile(String username, String token) {
-        UserEntity userEntity = userDao.findUserByToken(token);
-        UserRole userRole = userEntity.getRole();
-        // Check if the user is a DEVELOPER: can only get own profile
-        if (userRole != UserRole.DEVELOPER) {
-            UserEntity u = userDao.findUserByUsername(username);
-            if (u != null) {
-                UserDto checkedUser = convertUserEntitytoUserDto(u);
-                return checkedUser;
+    public UserDto getProfile(String username) {
+            UserEntity userEntity = userDao.findUserByUsername(username);
+            if (userEntity != null) {
+                UserDto userProfile = convertUserEntitytoUserDto(userEntity);
+                return userProfile;
             }
-        }
-        return null;
+        return new UserDto();
     }
 
     public boolean editProfile(UserDto user, String token) {
