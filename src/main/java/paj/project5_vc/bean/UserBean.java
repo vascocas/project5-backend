@@ -314,6 +314,9 @@ public class UserBean implements Serializable {
                 if (userList != null) {
                     // Get the total number of pages based on the total items and page size
                     int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+                    if(page>totalPages){
+                        page=totalPages;
+                    }
                     // Create and return the response object with users, total items, total pages, current page, and page size
                     return new UserTable(convertUsersFromEntityToUserManagmentDtoList(userList), totalItems, totalPages, page, pageSize);
                 }
