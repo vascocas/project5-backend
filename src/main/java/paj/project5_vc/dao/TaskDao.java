@@ -62,7 +62,7 @@ public class TaskDao extends AbstractDao<TaskEntity> {
 
     public int findTotalTasksByUser(String username) {
         try {
-            return em.createNamedQuery("TaskEntity.findTotalTasksByUser", Long.class)
+            return em.createNamedQuery("Task.findTotalTasksByUser", Long.class)
                     .setParameter("username", username)
                     .getSingleResult()
                     .intValue();
@@ -73,7 +73,7 @@ public class TaskDao extends AbstractDao<TaskEntity> {
 
     public int findTotalTasksByStateAndUser(String username, TaskState state) {
         try {
-            return em.createNamedQuery("TaskEntity.findTotalTasksByStateAndUser", Long.class)
+            return em.createNamedQuery("Task.findTotalTasksByStateAndUser", Long.class)
                     .setParameter("username", username)
                     .setParameter("state", state.getValue())
                     .getSingleResult()

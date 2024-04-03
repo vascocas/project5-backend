@@ -64,6 +64,13 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "user")
     private Set<TokenEntity> tokens;
 
+    @OneToMany(mappedBy = "sender")
+    private Set<MessageEntity> sentMessages;
+
+    @OneToMany(mappedBy = "receiver")
+    private Set<MessageEntity> receivedMessages;
+
+
     //default empty constructor
     public UserEntity() {
     }
@@ -162,5 +169,21 @@ public class UserEntity implements Serializable {
 
     public void setRole(UserRole role) {
         this.role = role.getValue();
+    }
+
+    public Set<MessageEntity> getSentMessages() {
+        return sentMessages;
+    }
+
+    public void setSentMessages(Set<MessageEntity> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    public Set<MessageEntity> getReceivedMessages() {
+        return receivedMessages;
+    }
+
+    public void setReceivedMessages(Set<MessageEntity> receivedMessages) {
+        this.receivedMessages = receivedMessages;
     }
 }
