@@ -1,6 +1,7 @@
 package paj.project5_vc.bean;
 
 import paj.project5_vc.dao.ConfigurationDao;
+import paj.project5_vc.dao.TaskDao;
 import paj.project5_vc.dao.TokenDao;
 import paj.project5_vc.dao.UserDao;
 import paj.project5_vc.dto.*;
@@ -8,6 +9,7 @@ import paj.project5_vc.entity.ConfigurationEntity;
 import paj.project5_vc.entity.TaskEntity;
 import paj.project5_vc.entity.TokenEntity;
 import paj.project5_vc.entity.UserEntity;
+import paj.project5_vc.enums.TaskState;
 import paj.project5_vc.enums.UserRole;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -18,7 +20,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Set;
 
 
 @Stateless
@@ -28,6 +29,8 @@ public class UserBean implements Serializable {
 
     @EJB
     UserDao userDao;
+    @EJB
+    TaskDao taskDao;
     @EJB
     TokenDao tokenDao;
     @EJB
@@ -142,13 +145,17 @@ public class UserBean implements Serializable {
         } else return new UserDto();
     }
 
-    public UserDto getProfile(String username) {
+    public ProfilePageDto getProfile(String username) {
             UserEntity userEntity = userDao.findUserByUsername(username);
             if (userEntity != null) {
-                UserDto userProfile = convertUserEntitytoUserDto(userEntity);
+                int totalTasks = taskDao.findTotalTasksByUser(username);
+                int totalToDoTasks = taskDao.findTotalTasksByStateAndUser(username, TaskState.TODO);
+                int totalDoingTasks= taskDao.findTotalTasksByStateAndUser(username, TaskState.DOING);
+                int totalDoneTasks= taskDao.findTotalTasksByStateAndUser(username, TaskState.DONE);
+                ProfilePageDto userProfile = new ProfilePageDto(convertUserEntitytoUserDto(userEntity), totalTasks, totalToDoTasks, totalDoingTasks, totalDoneTasks);
                 return userProfile;
             }
-        return new UserDto();
+        return new ProfilePageDto();
     }
 
     public boolean editProfile(UserDto user, String token) {
@@ -276,7 +283,7 @@ public class UserBean implements Serializable {
         return null;
     }
 
-    public UserTable getUsers(String token, UserRole role, String order, int page, int pageSize) {
+    public UserTableDto getUsers(String token, UserRole role, String order, int page, int pageSize) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
@@ -304,7 +311,7 @@ public class UserBean implements Serializable {
                         page=totalPages;
                     }
                     // Create and return the response object with users, total items, total pages, current page, and page size
-                    return new UserTable(convertUsersFromEntityToUserManagmentDtoList(userList), totalItems, totalPages, page, pageSize);
+                    return new UserTableDto(convertUsersFromEntityToUserManagmentDtoList(userList), totalItems, totalPages, page, pageSize);
                 }
             }
         }

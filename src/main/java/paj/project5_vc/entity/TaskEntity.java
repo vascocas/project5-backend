@@ -14,6 +14,11 @@ import java.time.LocalDate;
 @NamedQuery(name = "Task.findTasksByUser", query = "SELECT t FROM TaskEntity t WHERE t.creator = :creator AND t.deleted = :deleted")
 @NamedQuery(name = "Task.findTasksByCategoryId", query = "SELECT t FROM TaskEntity t WHERE t.category.id = :categoryId")
 @NamedQuery(name = "Task.findTasksByDeleted", query = "SELECT t FROM TaskEntity t WHERE t.deleted = :deleted ORDER BY t.id")
+@NamedQuery(name = "TaskEntity.findTotalTasksByUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.deleted = false")
+@NamedQuery(name = "TaskEntity.findTotalTasksByStateAndUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.state = :state AND t.deleted = false")
+
+
+
 public class TaskEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

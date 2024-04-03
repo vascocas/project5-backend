@@ -158,7 +158,7 @@ public class UserService {
             pageSize = 5;
         }
         // Call the getUsers method in your bean with pagination parameters
-        UserTable users = userBean.getUsers(token, role, order, page, pageSize);
+        UserTableDto users = userBean.getUsers(token, role, order, page, pageSize);
         if (users != null) {
             return Response.status(200).entity(users).build();
         } else {
@@ -192,7 +192,7 @@ public class UserService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProfile(@HeaderParam("token") String token, @QueryParam("username") String username) {
         if (userBean.tokenExist(token)) {
-            UserDto user = userBean.getProfile(username);
+            ProfilePageDto user = userBean.getProfile(username);
                 return Response.status(200).entity(user).build();
         } else {
             userBean.logout(token);

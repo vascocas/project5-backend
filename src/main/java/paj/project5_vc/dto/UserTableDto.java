@@ -2,14 +2,17 @@ package paj.project5_vc.dto;
 
 import java.util.ArrayList;
 
-public class UserTable {
+public class UserTableDto {
     private ArrayList<UserManagmentDto> users;
     private int totalItems;
     private int totalPages;
     private int currentPage;
     private int pageSize;
 
-    public UserTable(ArrayList<UserManagmentDto> users, int totalItems, int totalPages, int currentPage, int pageSize) {
+    public UserTableDto() {
+    }
+
+    public UserTableDto(ArrayList<UserManagmentDto> users, int totalItems, int totalPages, int currentPage, int pageSize) {
         this.users = users;
         this.totalItems = totalItems;
         this.totalPages = totalPages;

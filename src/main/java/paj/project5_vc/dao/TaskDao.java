@@ -6,6 +6,7 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
+import paj.project5_vc.enums.TaskState;
 
 import java.util.ArrayList;
 
@@ -56,6 +57,29 @@ public class TaskDao extends AbstractDao<TaskEntity> {
             return taskEntityEntities;
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public int findTotalTasksByUser(String username) {
+        try {
+            return em.createNamedQuery("TaskEntity.findTotalTasksByUser", Long.class)
+                    .setParameter("username", username)
+                    .getSingleResult()
+                    .intValue();
+        } catch (NoResultException e) {
+            return 0; // Return 0 if no tasks found for the username
+        }
+    }
+
+    public int findTotalTasksByStateAndUser(String username, TaskState state) {
+        try {
+            return em.createNamedQuery("TaskEntity.findTotalTasksByStateAndUser", Long.class)
+                    .setParameter("username", username)
+                    .setParameter("state", state.getValue())
+                    .getSingleResult()
+                    .intValue();
+        } catch (NoResultException e) {
+            return 0;
         }
     }
 
