@@ -62,4 +62,16 @@ public class MessageDao extends AbstractDao<MessageEntity> {
         }
     }
 
+    // Method to find messages changed between two users (sent messages)
+    public ArrayList<MessageEntity> findChangedMessages(UserEntity senderUser, UserEntity receiverUser) {
+        try {
+            return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findChangedMessages")
+                    .setParameter("sender", senderUser)
+                    .setParameter("receiver", receiverUser)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
 }

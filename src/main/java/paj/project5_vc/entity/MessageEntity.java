@@ -13,6 +13,7 @@ import java.io.Serializable;
 @NamedQuery(name = "Message.findMessagesForUser", query = "SELECT m FROM MessageEntity m WHERE m.receiver = :user ORDER BY m.sentTime")
 @NamedQuery(name = "Message.findMessagesFromUser", query = "SELECT m FROM MessageEntity m WHERE m.sender = :user ORDER BY m.sentTime")
 @NamedQuery(name = "Message.findAllUserMessages", query = "SELECT m FROM MessageEntity m WHERE m.sender = :user OR m.receiver = :user ORDER BY m.sentTime")
+@NamedQuery(name = "Message.findChangedMessages", query = "SELECT m FROM MessageEntity m WHERE m.receiver = :receiver AND m.sender = :sender ORDER BY m.sentTime")
 
 
 
