@@ -385,6 +385,7 @@ public class UserBean implements Serializable {
             userEntity.setPhoto(user.getPhoto());
         }
         userEntity.setDeleted(false);
+        userEntity.setValidated(false);
         return userEntity;
     }
 

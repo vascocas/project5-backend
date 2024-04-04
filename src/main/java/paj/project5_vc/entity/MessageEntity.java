@@ -9,8 +9,12 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "message")
-@NamedQuery(name = "Message.findMessagesForUser", query = "SELECT m FROM MessageEntity m WHERE m.receiver = :user")
 @NamedQuery(name = "Message.findById", query = "SELECT m FROM MessageEntity m WHERE m.id = :messageId")
+@NamedQuery(name = "Message.findMessagesForUser", query = "SELECT m FROM MessageEntity m WHERE m.receiver = :user ORDER BY m.sentTime")
+@NamedQuery(name = "Message.findMessagesFromUser", query = "SELECT m FROM MessageEntity m WHERE m.sender = :user ORDER BY m.sentTime")
+@NamedQuery(name = "Message.findAllUserMessages", query = "SELECT m FROM MessageEntity m WHERE m.sender = :user OR m.receiver = :user ORDER BY m.sentTime")
+
+
 
 public class MessageEntity implements Serializable {
 
@@ -21,12 +25,12 @@ public class MessageEntity implements Serializable {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private int id;
 
-    @Column(name = "message_text", nullable = false, updatable = false)
-    private String messageText;
-
     @CreationTimestamp
     @Column(name = "sent_at", nullable = false, updatable = false)
     private Timestamp sentTime;
+
+    @Column(name = "message_text", nullable = false, updatable = false)
+    private String messageText;
 
     @Column(name = "read_status", nullable = false)
     private boolean readStatus;

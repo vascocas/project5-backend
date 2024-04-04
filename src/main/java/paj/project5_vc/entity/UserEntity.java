@@ -55,6 +55,9 @@ public class UserEntity implements Serializable {
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
 
+    @Column(name = "validated", nullable = false)
+    private boolean validated;
+
     @Column(name = "role", nullable = false)
     private int role;
 
@@ -145,6 +148,14 @@ public class UserEntity implements Serializable {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public boolean isValidated() {
+        return validated;
+    }
+
+    public void setValidated(boolean validated) {
+        this.validated = validated;
     }
 
     public Set<TokenEntity> getTokens() {

@@ -3,7 +3,6 @@ package paj.project5_vc.bean;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import jakarta.ejb.EJB;
@@ -12,8 +11,11 @@ import jakarta.websocket.*;
 import paj.project5_vc.dao.MessageDao;
 import paj.project5_vc.dao.UserDao;
 import paj.project5_vc.dto.MessageDto;
+import paj.project5_vc.dto.TaskDto;
 import paj.project5_vc.entity.MessageEntity;
+import paj.project5_vc.entity.TaskEntity;
 import paj.project5_vc.entity.UserEntity;
+
 @Stateless
 public class MessageBean implements Serializable {
 
@@ -24,66 +26,76 @@ public class MessageBean implements Serializable {
     UserDao userDao;
 
     // Method for sending a message
-    public void sendMessage(MessageDto messageDto) {
+    public boolean sendMessage(MessageDto messageDto) {
         UserEntity sender = userDao.findUserById(messageDto.getSenderId());
         UserEntity receiver = userDao.findUserById(messageDto.getReceiverId());
-        MessageEntity message = new MessageEntity();
-        message.setSender(sender);
-        message.setReceiver(receiver);
-        message.setMessageText(messageDto.getMessageText());
-        messageDao.persist(message);
-    }
-
-    // Method for sending a message via websocket
-    public void sendMessageViaWebSocket(MessageEntity message, Session session) {
-        try {
-            // Convert the message entity to JSON format
-            String jsonMessage = convertMessageEntityToJson(message);
-
-            // Send the message via websocket
-            session.getBasicRemote().sendText(jsonMessage);
-        } catch (IOException e) {
-            // Handle any exceptions
-            e.printStackTrace();
+        if (sender != null && receiver != null) {
+            MessageEntity message = new MessageEntity();
+            message.setSender(sender);
+            message.setReceiver(receiver);
+            message.setMessageText(messageDto.getMessageText());
+            message.setReadStatus(false);
+            messageDao.persist(message);
+            return true;
         }
-    }
-
-    // Method to convert message entity to JSON format (You'll need to implement this)
-    private String convertMessageEntityToJson(MessageEntity message) {
-        // Implement logic to convert message entity to JSON format
-        // You can use libraries like Gson or Jackson for JSON serialization
-        return ""; // Placeholder for JSON message
+        return false;
     }
 
     // Method for marking a message as read
-    public void markMessageAsRead(int messageId) {
+    public boolean markMessageAsRead(int messageId) {
         MessageEntity message = messageDao.findById(messageId);
         if (message != null) {
             message.setReadStatus(true);
+            return true;
+        } else return false;
+    }
 
+    // Method for fetching messages for a user
+    public ArrayList<MessageDto> getReceivedUserMessages(int userId) {
+        // Retrieve the user entity corresponding to the userId
+        UserEntity user = userDao.findUserById(userId);
+        if (user != null) {
+            // Retrieve messages for the user from the database
+            ArrayList<MessageEntity> messageEntities = messageDao.findMessagesForUser(user);
+            // Convert MessageEntity objects to MessageDto objects
+            ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);
+            return messages;
+        } else {
+            // If user is not found, return an empty list
+            return new ArrayList<>();
+        }
+    }
+
+    // Method for fetching messages from a user
+    public ArrayList<MessageDto> getSentUserMessages(int userId) {
+        // Retrieve the user entity corresponding to the userId
+        UserEntity user = userDao.findUserById(userId);
+        if (user != null) {
+            // Retrieve messages for the user from the database
+            ArrayList<MessageEntity> messageEntities = messageDao.findMessagesFromUser(user);
+            // Convert MessageEntity objects to MessageDto objects
+            ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);
+            return messages;
+        } else {
+            // If user is not found, return an empty list
+            return new ArrayList<>();
         }
     }
 
     // Method for fetching messages for a user
-    public List<MessageDto> getMessagesForUser(int userId) {
+    public ArrayList<MessageDto> getAllUserMessages(int userId) {
         // Retrieve the user entity corresponding to the userId
-        UserEntity user = userDao.findUserById(userId); // Assuming you have a method in your user DAO to find a user by ID
-
-        if (user == null) {
+        UserEntity user = userDao.findUserById(userId);
+        if (user != null) {
+            // Retrieve messages for the user from the database
+            ArrayList<MessageEntity> messageEntities = messageDao.findAllUserMessages(user);
+            // Convert MessageEntity objects to MessageDto objects
+            ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);
+            return messages;
+        } else {
             // If user is not found, return an empty list
             return new ArrayList<>();
         }
-
-        // Retrieve messages for the user from the database
-        List<MessageEntity> messageEntities = messageDao.findMessagesForUser(user);
-
-        // Convert MessageEntity objects to MessageDto objects
-        List<MessageDto> messages = new ArrayList<>();
-        for (MessageEntity messageEntity : messageEntities) {
-            messages.add(convertMessageEntityToDto(messageEntity));
-        }
-
-        return messages;
     }
 
     // Method to convert MessageEntity to MessageDto
@@ -98,7 +110,16 @@ public class MessageBean implements Serializable {
         return messageDto;
     }
 
+    // Method to convert ArrayList<MessageEntity> to ArrayList<MessageDto>
+    private ArrayList<MessageDto> convertMessagesFromEntityListToDtoList(ArrayList<MessageEntity> messageEntities) {
+        ArrayList<MessageDto> msgDtos = new ArrayList<>();
+        for (MessageEntity m : messageEntities) {
+            msgDtos.add(convertMessageEntityToDto(m));
+        }
+        return msgDtos;
+    }
 
+    // (apply in websocket package)
     // Method for handling incoming websocket messages
     public void handleMessageFromWebSocket(MessageEntity message, Session session) {
         try {
@@ -106,7 +127,7 @@ public class MessageBean implements Serializable {
             Integer senderId = (Integer) session.getUserProperties().get("userId");
             String senderUsername = (String) session.getUserProperties().get("username");
 
-            if (senderId!=null && senderUsername!=null) {
+            if (senderId != null && senderUsername != null) {
 
                 // Save the message to the database
                 UserEntity sender = userDao.findUserById(senderId);
@@ -123,6 +144,26 @@ public class MessageBean implements Serializable {
         }
     }
 
+    // (apply in websocket package)
+    // Method for sending a message via websocket
+    public void sendMessageViaWebSocket(MessageEntity message, Session session) {
+        try {
+            // Convert the message entity to JSON format
+            String jsonMessage = convertMessageEntityToJson(message);
 
+            // Send the message via websocket
+            session.getBasicRemote().sendText(jsonMessage);
+        } catch (IOException e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        }
+    }
 
+    // (apply in websocket package)
+    // Method to convert message entity to JSON format
+    private String convertMessageEntityToJson(MessageEntity message) {
+        // Implement logic to convert message entity to JSON format
+        // You can use libraries like Gson or Jackson for JSON serialization
+        return ""; // Placeholder for JSON message
+    }
 }
