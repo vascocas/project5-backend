@@ -5,6 +5,8 @@ import jakarta.xml.bind.annotation.XmlElement;
 public class PublicProfileDto {
 
     @XmlElement
+    private int userId;
+    @XmlElement
     private String username;
     @XmlElement
     private String email;
@@ -26,7 +28,8 @@ public class PublicProfileDto {
     public PublicProfileDto() {
     }
 
-    public PublicProfileDto(String username, String email, String firstName, String lastName, String photo, int totalTasks, int totalToDoTasks, int totalDoingTasks, int totalDoneTasks) {
+    public PublicProfileDto(int userId, String username, String email, String firstName, String lastName, String photo, int totalTasks, int totalToDoTasks, int totalDoingTasks, int totalDoneTasks) {
+        this.userId = userId;
         this.username = username;
         this.email = email;
         this.firstName = firstName;
@@ -36,6 +39,14 @@ public class PublicProfileDto {
         this.totalToDoTasks = totalToDoTasks;
         this.totalDoingTasks = totalDoingTasks;
         this.totalDoneTasks = totalDoneTasks;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {

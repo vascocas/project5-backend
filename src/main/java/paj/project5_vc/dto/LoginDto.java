@@ -8,6 +8,8 @@ import paj.project5_vc.enums.UserRole;
 public class LoginDto {
 
     @XmlElement
+    private int id;
+    @XmlElement
     private String username;
     @XmlElement
     private String password;
@@ -22,12 +24,21 @@ public class LoginDto {
     }
 
 
-    public LoginDto(String username, String password, UserRole role, String token, String photo) {
+    public LoginDto(int id, String username, String password, UserRole role, String token, String photo) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.role = role;
         this.token = token;
         this.photo = photo;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUsername() {

@@ -77,9 +77,10 @@ public class UserBean implements Serializable {
                 tokenEntity.setTokenExpiration(Instant.now().plus(timer.getTokenTimer(), ChronoUnit.MINUTES));
                 tokenDao.persist(tokenEntity);
                 successLogin.setToken(tokenValue);
+                successLogin.setId(userEntity.getId());
+                successLogin.setUsername(username);
                 successLogin.setRole(userEntity.getRole());
                 successLogin.setPhoto(userEntity.getPhoto());
-                successLogin.setUsername(username);
                 return successLogin;
             }
         }
@@ -164,13 +165,13 @@ public class UserBean implements Serializable {
     }
 
     // Colocar verificação para user Validado
-    public UserDto getProfile(String token, String username) {
+    public UserDto getProfile(String token, int userId) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
             // Check if the user is a DEVELOPER or SCRUM_MASTER: can only edit own profile
             if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
-                UserEntity userEdit = userDao.findUserByUsername(username);
+                UserEntity userEdit = userDao.findUserById(userId);
                 if (userEntity != null) {
                     UserDto userDto = new UserDto();
                     userDto.setId(userEdit.getId());
@@ -193,6 +194,7 @@ public class UserBean implements Serializable {
         UserEntity userEntity = userDao.findUserByUsername(username);
         if (userEntity != null) {
             PublicProfileDto profileDto = new PublicProfileDto();
+            profileDto.setUserId(userEntity.getId());
             profileDto.setUsername(userEntity.getUsername());
             profileDto.setEmail(userEntity.getEmail());
             profileDto.setFirstName(userEntity.getFirstName());
@@ -463,6 +465,7 @@ public class UserBean implements Serializable {
 
     private LoginDto convertUserEntitytoLoginDto(UserEntity user) {
         LoginDto loginDto = new LoginDto();
+        loginDto.setId(user.getId());
         loginDto.setUsername(user.getUsername());
         loginDto.setPassword(user.getPassword());
         loginDto.setRole(user.getRole());
