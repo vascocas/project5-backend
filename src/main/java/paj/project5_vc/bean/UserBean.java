@@ -145,17 +145,64 @@ public class UserBean implements Serializable {
         } else return new UserDto();
     }
 
-    public ProfilePageDto getProfile(String username) {
-            UserEntity userEntity = userDao.findUserByUsername(username);
-            if (userEntity != null) {
-                int totalTasks = taskDao.findTotalTasksByUser(username);
-                int totalToDoTasks = taskDao.findTotalTasksByStateAndUser(username, TaskState.TODO);
-                int totalDoingTasks= taskDao.findTotalTasksByStateAndUser(username, TaskState.DOING);
-                int totalDoneTasks= taskDao.findTotalTasksByStateAndUser(username, TaskState.DONE);
-                ProfilePageDto userProfile = new ProfilePageDto(convertUserEntitytoUserDto(userEntity), totalTasks, totalToDoTasks, totalDoingTasks, totalDoneTasks);
-                return userProfile;
+    public UserDto getLoggedProfile(String token) {
+        UserEntity userEntity = userDao.findUserByToken(token);
+        if (userEntity != null) {
+            UserDto userDto = new UserDto();
+            userDto.setId(userEntity.getId());
+            userDto.setUsername(userEntity.getUsername());
+            userDto.setEmail(userEntity.getEmail());
+            userDto.setFirstName(userEntity.getFirstName());
+            userDto.setLastName(userEntity.getLastName());
+            userDto.setPhone(userEntity.getPhone());
+            userDto.setPhoto(userEntity.getPhoto());
+            userDto.setDeleted(userEntity.isDeleted());
+            userDto.setRole(userEntity.getRole());
+            return userDto;
+        }
+        return new UserDto();
+    }
+
+    // Colocar verificação para user Validado
+    public UserDto getProfile(String token, String username) {
+        UserEntity userEntity = userDao.findUserByToken(token);
+        if (userEntity != null) {
+            UserRole userRole = userEntity.getRole();
+            // Check if the user is a DEVELOPER or SCRUM_MASTER: can only edit own profile
+            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
+                UserEntity userEdit = userDao.findUserByUsername(username);
+                UserDto userDto = new UserDto();
+                userDto.setId(userEdit.getId());
+                userDto.setUsername(userEdit.getUsername());
+                userDto.setEmail(userEdit.getEmail());
+                userDto.setFirstName(userEdit.getFirstName());
+                userDto.setLastName(userEdit.getLastName());
+                userDto.setPhone(userEdit.getPhone());
+                userDto.setPhoto(userEdit.getPhoto());
+                userDto.setDeleted(userEdit.isDeleted());
+                userDto.setRole(userEdit.getRole());
+                return userDto;
             }
-        return new ProfilePageDto();
+        }
+        return new UserDto();
+    }
+
+    public PublicProfileDto getPublicProfile(String username) {
+        UserEntity userEntity = userDao.findUserByUsername(username);
+        if (userEntity != null) {
+            PublicProfileDto profileDto = new PublicProfileDto();
+            profileDto.setUsername(userEntity.getUsername());
+            profileDto.setEmail(userEntity.getEmail());
+            profileDto.setFirstName(userEntity.getFirstName());
+            profileDto.setLastName(userEntity.getLastName());
+            profileDto.setPhoto(userEntity.getPhoto());
+            profileDto.setTotalTasks(taskDao.findTotalTasksByUser(username));
+            profileDto.setTotalToDoTasks(taskDao.findTotalTasksByStateAndUser(username, TaskState.TODO));
+            profileDto.setTotalDoingTasks(taskDao.findTotalTasksByStateAndUser(username, TaskState.DOING));
+            profileDto.setTotalDoneTasks(taskDao.findTotalTasksByStateAndUser(username, TaskState.DONE));
+            return profileDto;
+        }
+        return new PublicProfileDto();
     }
 
     public boolean editProfile(UserDto user, String token) {
@@ -307,8 +354,8 @@ public class UserBean implements Serializable {
                 if (userList != null) {
                     // Get the total number of pages based on the total items and page size
                     int totalPages = (int) Math.ceil((double) totalItems / pageSize);
-                    if(page>totalPages){
-                        page=totalPages;
+                    if (page > totalPages) {
+                        page = totalPages;
                     }
                     // Create and return the response object with users, total items, total pages, current page, and page size
                     return new UserTableDto(convertUsersFromEntityToUserManagmentDtoList(userList), totalItems, totalPages, page, pageSize);

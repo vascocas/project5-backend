@@ -185,15 +185,45 @@ public class UserService {
         }
     }
 
+    // Get logged user
+    @GET
+    @Path("/logged")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProfile(@HeaderParam("token") String token) {
+        if (userBean.tokenExist(token)) {
+            UserDto user = userBean.getLoggedProfile(token);
+            return Response.status(200).entity(user).build();
+        } else {
+            userBean.logout(token);
+            return Response.status(401).entity("Invalid Token!").build();
+        }
+    }
+
+    // Get public profile by username
+    @GET
+    @Path("/profile/username")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPublicProfile(@HeaderParam("token") String token, @QueryParam("username") String username) {
+        if (userBean.tokenExist(token)) {
+            PublicProfileDto user = userBean.getPublicProfile(username);
+                return Response.status(200).entity(user).build();
+        } else {
+            userBean.logout(token);
+            return Response.status(401).entity("Invalid Token!").build();
+        }
+    }
+
     // Get user by username
     @GET
     @Path("/username")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProfile(@HeaderParam("token") String token, @QueryParam("username") String username) {
+    public Response getEditProfile(@HeaderParam("token") String token, @QueryParam("username") String username) {
         if (userBean.tokenExist(token)) {
-            ProfilePageDto user = userBean.getProfile(username);
-                return Response.status(200).entity(user).build();
+            UserDto user = userBean.getProfile(token, username);
+            return Response.status(200).entity(user).build();
         } else {
             userBean.logout(token);
             return Response.status(401).entity("Invalid Token!").build();
