@@ -171,17 +171,19 @@ public class UserBean implements Serializable {
             // Check if the user is a DEVELOPER or SCRUM_MASTER: can only edit own profile
             if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
                 UserEntity userEdit = userDao.findUserByUsername(username);
-                UserDto userDto = new UserDto();
-                userDto.setId(userEdit.getId());
-                userDto.setUsername(userEdit.getUsername());
-                userDto.setEmail(userEdit.getEmail());
-                userDto.setFirstName(userEdit.getFirstName());
-                userDto.setLastName(userEdit.getLastName());
-                userDto.setPhone(userEdit.getPhone());
-                userDto.setPhoto(userEdit.getPhoto());
-                userDto.setDeleted(userEdit.isDeleted());
-                userDto.setRole(userEdit.getRole());
-                return userDto;
+                if (userEntity != null) {
+                    UserDto userDto = new UserDto();
+                    userDto.setId(userEdit.getId());
+                    userDto.setUsername(userEdit.getUsername());
+                    userDto.setEmail(userEdit.getEmail());
+                    userDto.setFirstName(userEdit.getFirstName());
+                    userDto.setLastName(userEdit.getLastName());
+                    userDto.setPhone(userEdit.getPhone());
+                    userDto.setPhoto(userEdit.getPhoto());
+                    userDto.setDeleted(userEdit.isDeleted());
+                    userDto.setRole(userEdit.getRole());
+                    return userDto;
+                }
             }
         }
         return new UserDto();

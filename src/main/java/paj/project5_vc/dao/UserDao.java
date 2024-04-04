@@ -57,8 +57,7 @@ public class UserDao extends AbstractDao<UserEntity> {
 
     public ArrayList<UserEntity> findAllActiveUsernames() {
         try {
-            // Apply pagination using the offset and pageSize parameters
-            ArrayList<UserEntity> activeUsers = (ArrayList<UserEntity>) em.createNamedQuery("User.findAllActiveUsers")
+            ArrayList<UserEntity> activeUsers = (ArrayList<UserEntity>) em.createNamedQuery("User.findAllActiveUsernames")
                     .getResultList();
             return activeUsers;
         } catch (Exception e) {
