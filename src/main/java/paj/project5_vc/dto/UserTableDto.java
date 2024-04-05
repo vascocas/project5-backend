@@ -1,12 +1,21 @@
 package paj.project5_vc.dto;
 
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import java.util.ArrayList;
 
+@XmlRootElement
 public class UserTableDto {
+    @XmlElement
     private ArrayList<UserManagmentDto> users;
+    @XmlElement
     private int totalItems;
+    @XmlElement
     private int totalPages;
+    @XmlElement
     private int currentPage;
+    @XmlElement
     private int pageSize;
 
     public UserTableDto() {

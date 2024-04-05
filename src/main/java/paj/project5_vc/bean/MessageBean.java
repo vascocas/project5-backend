@@ -45,9 +45,16 @@ public class MessageBean implements Serializable {
     public boolean markMessageAsRead(int messageId) {
         MessageEntity message = messageDao.findById(messageId);
         if (message != null) {
-            message.setReadStatus(true);
+            // Fetch all previous messages based on sentTime
+            ArrayList<MessageEntity> previousMessages = messageDao.findPreviousMessages(message.getSentTime());
+            // Mark all previous messages as read
+            for (MessageEntity prevMessage : previousMessages) {
+                prevMessage.setReadStatus(true);
+            }
             return true;
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
     // Method for fetching messages for a user
@@ -98,29 +105,13 @@ public class MessageBean implements Serializable {
         }
     }
 
-    // Method for fetching inbox chat messages
-    public ArrayList<MessageDto> getInboxMessages(int senderId, int receiverId) {
+    // Method for fetching chat messages
+    public ArrayList<MessageDto> getChatMessages(int senderId, int receiverId) {
         // Retrieve the user entity corresponding to the id
         UserEntity sender = userDao.findUserById(senderId);
         UserEntity receiver = userDao.findUserById(receiverId);
         if (sender != null && receiver!= null) {
             ArrayList<MessageEntity> messageEntities = messageDao.findChangedMessages(sender, receiver);
-            // Convert MessageEntity objects to MessageDto objects
-            ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);
-            return messages;
-        } else {
-            // If user is not found, return an empty list
-            return new ArrayList<>();
-        }
-    }
-
-    // Method for fetching sent chat messages
-    public ArrayList<MessageDto> getSentMessages(int receiverId, int senderId) {
-        // Retrieve the user entity corresponding to the id
-        UserEntity receiver = userDao.findUserById(receiverId);
-        UserEntity sender = userDao.findUserById(senderId);
-        if (receiver != null && sender!= null) {
-            ArrayList<MessageEntity> messageEntities = messageDao.findChangedMessages(receiver, sender);
             // Convert MessageEntity objects to MessageDto objects
             ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);
             return messages;

@@ -1,15 +1,25 @@
 package paj.project5_vc.dto;
 
 
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import java.sql.Timestamp;
 
+@XmlRootElement
 public class MessageDto {
 
+    @XmlElement
     private int id;
+    @XmlElement
     private String messageText;
+    @XmlElement
     private Timestamp sentTime;
+    @XmlElement
     private boolean readStatus;
+    @XmlElement
     private int senderId;
+    @XmlElement
     private int receiverId;
 
     // Default constructor

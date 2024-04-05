@@ -3,8 +3,7 @@ package paj.project5_vc.dao;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
 import paj.project5_vc.entity.MessageEntity;
-import paj.project5_vc.entity.TaskEntity;
-import paj.project5_vc.entity.TokenEntity;
+import java.sql.Timestamp;
 import paj.project5_vc.entity.UserEntity;
 
 import java.util.ArrayList;
@@ -27,6 +26,17 @@ public class MessageDao extends AbstractDao<MessageEntity> {
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;
+        }
+    }
+
+    // Method to find previous messages based on sentTime
+    public ArrayList<MessageEntity> findPreviousMessages(Timestamp sentTime) {
+        try {
+            return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findPreviousMessages")
+                    .setParameter("sentTime", sentTime)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
         }
     }
 

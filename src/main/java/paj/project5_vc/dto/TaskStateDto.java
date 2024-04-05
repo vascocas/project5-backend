@@ -6,7 +6,6 @@ import jakarta.xml.bind.annotation.XmlElement;
 
 @XmlRootElement
 public class TaskStateDto {
-
     @XmlElement
     private int id;
     @XmlElement

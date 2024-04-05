@@ -88,27 +88,15 @@ public class MessageService {
         return Response.status(200).entity(messages).build();
     }
 
-    // Endpoint to get messages inbox chat messages
+    // Endpoint to get chat messages
     @GET
-    @Path("/inboxChat/{senderId}/{receiverId}")
+    @Path("/chat/{senderId}/{receiverId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getInboxChatMessages(@HeaderParam("token") String token, @PathParam("senderId") int senderId, @PathParam("receiverId") int receiverId) {
+    public Response getChatMessages(@HeaderParam("token") String token, @PathParam("senderId") int senderId, @PathParam("receiverId") int receiverId) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        ArrayList<MessageDto> messages = messageBean.getInboxMessages(senderId, receiverId);
-        return Response.status(200).entity(messages).build();
-    }
-
-    // Endpoint to get messages sent chat messages
-    @GET
-    @Path("/sentChat/{receiverId}/{senderId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getSentChatMessages(@HeaderParam("token") String token, @PathParam("receiverId") int receiverId, @PathParam("senderId") int senderId) {
-        if (!userBean.tokenExist(token)) {
-            return Response.status(401).entity("Invalid token").build();
-        }
-        ArrayList<MessageDto> messages = messageBean.getSentMessages(receiverId, senderId);
+        ArrayList<MessageDto> messages = messageBean.getChatMessages(senderId, receiverId);
         return Response.status(200).entity(messages).build();
     }
 

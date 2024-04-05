@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 @XmlRootElement
 public class TaskDto {
-
     @XmlElement
     private int id;
     @XmlElement

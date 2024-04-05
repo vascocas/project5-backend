@@ -7,7 +7,6 @@ import paj.project5_vc.enums.UserRole;
 @XmlRootElement
 public class UserManagmentDto {
 
-
     @XmlElement
     private int id;
     @XmlElement
