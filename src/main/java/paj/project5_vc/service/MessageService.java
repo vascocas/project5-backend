@@ -1,7 +1,6 @@
 package paj.project5_vc.service;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.ejb.EJB;
 import jakarta.inject.Inject;

@@ -5,9 +5,8 @@ import jakarta.persistence.NoResultException;
 import paj.project5_vc.entity.MessageEntity;
 import java.sql.Timestamp;
 import paj.project5_vc.entity.UserEntity;
-
 import java.util.ArrayList;
-import java.util.List;
+
 
 @Stateless
 public class MessageDao extends AbstractDao<MessageEntity> {

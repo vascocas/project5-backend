@@ -74,6 +74,9 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "receiver")
     private Set<MessageEntity> receivedMessages;
 
+    @OneToMany(mappedBy = "recipient_user")
+    private Set<NotificationEntity> recipientUser;
+
 
     //default empty constructor
     public UserEntity() {
