@@ -24,13 +24,13 @@ public class NotificationService {
 
     // Endpoint to get user notifications
     @GET
-    @Path("/{recipientId}")
+    @Path("")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getChatMessages(@HeaderParam("token") String token, @PathParam("recipientId") int recipientId) {
+    public Response getUserNotifications(@HeaderParam("token") String token) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        ArrayList<NotificationDto> notifications = notificationBean.getUserNotifications(recipientId);
+        ArrayList<NotificationDto> notifications = notificationBean.getUserNotifications(token);
         return Response.status(200).entity(notifications).build();
     }
 
@@ -49,15 +49,29 @@ public class NotificationService {
         }
     }
 
-    // Endpoint to mark a notification as read
+    // Endpoint to mark a notification as read (by Id), and its previous
     @PUT
     @Path("/read/{notificationId}")
-    public Response markMessageAsRead(@HeaderParam("token") String token, @PathParam("notificationId") int notificationId) {
+    public Response markNotificationAsRead(@HeaderParam("token") String token, @PathParam("notificationId") int notificationId) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
         if (notificationBean.markNotificationAsRead(notificationId)) {
-            return Response.status(200).entity("Notification marked as read!").build();
+            return Response.status(200).entity("Notifications marked as read!").build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
+        }
+    }
+
+    // Endpoint to mark all user notifications as read
+    @PUT
+    @Path("/read")
+    public Response markAllUserNotificationsAsRead(@HeaderParam("token") String token) {
+        if (!userBean.tokenExist(token)) {
+            return Response.status(401).entity("Invalid token").build();
+        }
+        if (notificationBean.markAllNotificationsRead(token)) {
+            return Response.status(200).entity("Notifications marked as read!").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
         }

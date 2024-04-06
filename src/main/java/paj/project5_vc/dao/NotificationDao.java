@@ -40,10 +40,21 @@ public class NotificationDao extends AbstractDao<NotificationEntity> {
         }
     }
 
-    // Method to find user notifications
-    public ArrayList<NotificationEntity> findUserNotifications(UserEntity recipient) {
+    // Method to find All user notifications
+    public ArrayList<NotificationEntity> findAllUserNotifications(UserEntity recipient) {
         try {
             return (ArrayList<NotificationEntity>) em.createNamedQuery("Notification.findUserNotifications")
+                    .setParameter("recipient", recipient)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    // Method to find unread user notifications
+    public ArrayList<NotificationEntity> findUnreadUserNotifications(UserEntity recipient) {
+        try {
+            return (ArrayList<NotificationEntity>) em.createNamedQuery("Notification.findUnreadUserNotifications")
                     .setParameter("recipient", recipient)
                     .getResultList();
         } catch (NoResultException e) {

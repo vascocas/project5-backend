@@ -9,10 +9,12 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.websocket.*;
 import paj.project5_vc.dao.MessageDao;
+import paj.project5_vc.dao.NotificationDao;
 import paj.project5_vc.dao.UserDao;
 import paj.project5_vc.dto.MessageDto;
 import paj.project5_vc.dto.TaskDto;
 import paj.project5_vc.entity.MessageEntity;
+import paj.project5_vc.entity.NotificationEntity;
 import paj.project5_vc.entity.TaskEntity;
 import paj.project5_vc.entity.UserEntity;
 
@@ -21,7 +23,8 @@ public class MessageBean implements Serializable {
 
     @EJB
     MessageDao messageDao;
-
+    @EJB
+    NotificationDao notificationDao;
     @EJB
     UserDao userDao;
 
@@ -36,6 +39,11 @@ public class MessageBean implements Serializable {
             message.setMessageText(messageDto.getMessageText());
             message.setReadStatus(false);
             messageDao.persist(message);
+            NotificationEntity notif = new NotificationEntity();
+            notif.setRecipientUser(receiver);
+            notif.setContentText("New message received from: " + receiver.getUsername());
+            notif.setReadStatus(false);
+            notificationDao.persist(notif);
             return true;
         }
         return false;

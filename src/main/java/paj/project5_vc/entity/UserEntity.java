@@ -201,4 +201,12 @@ public class UserEntity implements Serializable {
     public void setReceivedMessages(Set<MessageEntity> receivedMessages) {
         this.receivedMessages = receivedMessages;
     }
+
+    public Set<NotificationEntity> getRecipientUser() {
+        return recipientUser;
+    }
+
+    public void setRecipientUser(Set<NotificationEntity> recipientUser) {
+        this.recipientUser = recipientUser;
+    }
 }

@@ -20,12 +20,12 @@ public class NotificationBean implements Serializable {
     @EJB
     UserDao userDao;
 
-    // Method for fetching chat messages
-    public ArrayList<NotificationDto> getUserNotifications(int userId) {
-        // Retrieve the user entity corresponding to the id
-        UserEntity recipient = userDao.findUserById(userId);
+    // Method for get all user notifications
+    public ArrayList<NotificationDto> getUserNotifications(String token) {
+        // Retrieve the user entity corresponding to the token
+        UserEntity recipient = userDao.findUserByToken(token);
         if (recipient != null) {
-            ArrayList<NotificationEntity> notifEntities = notificationDao.findUserNotifications(recipient);
+            ArrayList<NotificationEntity> notifEntities = notificationDao.findAllUserNotifications(recipient);
             // Convert NotificationEntity objects to MessageDto objects
             ArrayList<NotificationDto> notifications = convertNotifFromEntityListToDtoList(notifEntities);
             return notifications;
@@ -43,6 +43,23 @@ public class NotificationBean implements Serializable {
             ArrayList<NotificationEntity> previousNotifs = notificationDao.findPreviousNotifications(notification.getCreationTime());
             // Mark all previous notifications as read
             for (NotificationEntity prevNotification : previousNotifs) {
+                prevNotification.setReadStatus(true);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Method for mark all user notifications as read
+    public boolean markAllNotificationsRead(String token) {
+        // Retrieve the user entity corresponding to the token
+        UserEntity recipient = userDao.findUserByToken(token);
+        if (recipient != null) {
+            // Fetch all user notifications
+            ArrayList<NotificationEntity> userNotifs = notificationDao.findUnreadUserNotifications(recipient);
+            // Mark all notifications as read
+            for (NotificationEntity prevNotification : userNotifs) {
                 prevNotification.setReadStatus(true);
             }
             return true;

@@ -12,6 +12,8 @@ import java.sql.Timestamp;
 @NamedQuery(name = "Notification.findById", query = "SELECT n FROM NotificationEntity n WHERE n.id = :notificationId")
 @NamedQuery(name = "Notification.findPreviousNotifications", query = "SELECT n FROM NotificationEntity n WHERE n.creationTime <= :creationTime")
 @NamedQuery(name = "Notification.findUserNotifications", query = "SELECT n FROM NotificationEntity n WHERE n.recipientUser = :recipient")
+@NamedQuery(name = "Notification.findUnreadUserNotifications", query = "SELECT n FROM NotificationEntity n WHERE n.recipientUser = :recipient AND n.readStatus = false")
+
 
 public class NotificationEntity implements Serializable {
 
