@@ -16,7 +16,8 @@ import java.time.LocalDate;
 @NamedQuery(name = "Task.findTasksByDeleted", query = "SELECT t FROM TaskEntity t WHERE t.deleted = :deleted ORDER BY t.id")
 @NamedQuery(name = "Task.findTotalTasksByUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.deleted = false")
 @NamedQuery(name = "Task.findTotalTasksByStateAndUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.state = :state AND t.deleted = false")
-
+@NamedQuery(name = "Task.findAverageTasksPerUser", query = "SELECT AVG(tasksPerUser) FROM (SELECT COUNT(t) AS tasksPerUser FROM TaskEntity t WHERE t.creator.id = :creatorId AND t.deleted = false GROUP BY t.creator)")
+@NamedQuery(name = "Task.countTasksByStatus",query = "SELECT t.state, COUNT(t) AS taskCount FROM TaskEntity t WHERE t.deleted = false GROUP BY t.state")
 
 
 public class TaskEntity implements Serializable {

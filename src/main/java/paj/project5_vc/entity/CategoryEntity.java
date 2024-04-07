@@ -10,6 +10,7 @@ import java.util.Set;
 @NamedQuery(name = "Category.findAllCategories", query = "SELECT c FROM CategoryEntity c ORDER by c.id")
 @NamedQuery(name = "Category.findCategoryByName", query = "SELECT c FROM CategoryEntity c WHERE c.categoryName = :name")
 @NamedQuery(name = "Category.findCategoryById", query = "SELECT c FROM CategoryEntity c WHERE c.id = :id")
+@NamedQuery(name = "Category.findCategoriesByTaskCount", query = "SELECT c, COUNT(t) as taskCount FROM CategoryEntity c JOIN c.tasks t WHERE t.deleted = false GROUP BY c ORDER BY taskCount DESC")
 
 public class CategoryEntity implements Serializable {
 

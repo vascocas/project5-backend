@@ -44,4 +44,13 @@ public class CategoryDao extends AbstractDao<CategoryEntity> {
             return null;
         }
     }
+
+    public ArrayList<CategoryEntity> findCategoriesByTaskCount() {
+        try {
+            return (ArrayList<CategoryEntity>) em.createNamedQuery("Category.findCategoriesByTaskCount")
+                    .getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

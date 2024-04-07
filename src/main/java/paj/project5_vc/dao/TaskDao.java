@@ -102,4 +102,22 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         }
     }
 
+    public Double getAverageTasksPerUser(int creatorId) {
+        try {
+            return (Double) em.createNamedQuery("Task.findAverageTasksPerUser")
+                    .setParameter("creatorId", creatorId)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public ArrayList<TaskEntity> countTasksByStatus() {
+        try {
+            return (ArrayList<TaskEntity>) em.createNamedQuery("Task.countTasksByStatus")
+                    .getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
