@@ -245,10 +245,6 @@ public class TaskBean implements Serializable {
         return false;
     }
 
-    public double calculateTaskCompletionTime() {
-
-        return taskDao.findAverageCompletionTime();
-    }
 
     private TaskDto convertTaskFromEntityToDto(TaskEntity t) {
         TaskDto taskDto = new TaskDto();
