@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 
 
+
 @Stateless
 public class UserBean implements Serializable {
 
@@ -508,4 +509,5 @@ public class UserBean implements Serializable {
         }
         return usersDtos;
     }
+
 }

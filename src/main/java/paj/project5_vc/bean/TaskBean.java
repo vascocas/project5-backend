@@ -16,7 +16,7 @@ import jakarta.ejb.Stateless;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.time.temporal.ChronoUnit;
+
 
 
 @Stateless
@@ -245,13 +245,9 @@ public class TaskBean implements Serializable {
         return false;
     }
 
-    public long calculateTaskCompletionTime(TaskEntity task) {
-        if (task.getStartDate() != null && task.getCompletedDate() != null) {
-            return ChronoUnit.DAYS.between(task.getStartDate(), task.getCompletedDate());
-        } else {
-            // Handle case where timestamps are not set
-            return -1; // or throw an exception
-        }
+    public double calculateTaskCompletionTime() {
+
+        return taskDao.findAverageCompletionTime();
     }
 
     private TaskDto convertTaskFromEntityToDto(TaskEntity t) {

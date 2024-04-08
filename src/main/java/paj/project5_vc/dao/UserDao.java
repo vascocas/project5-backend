@@ -7,6 +7,8 @@ import jakarta.persistence.NoResultException;
 import paj.project5_vc.enums.UserRole;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.sql.Timestamp;
 
 @Stateless
 public class UserDao extends AbstractDao<UserEntity> {
@@ -153,6 +155,22 @@ public class UserDao extends AbstractDao<UserEntity> {
         } catch (Exception e) {
             return 0; // Handle any exceptions appropriately
         }
+    }
+
+    // Verificar método
+    public void processValidatedUsersOverTime() {
+        List<Object[]> validatedUsersOverTime = findValidatedUsersOverTime();
+        for (Object[] result : validatedUsersOverTime) {
+            Timestamp validatedAt = (Timestamp) result[0];
+            long userCount = (long) result[1];
+            // Process each data point (validatedAt, userCount)
+            System.out.println("Validated At: " + validatedAt + ", User Count: " + userCount);
+        }
+    }
+
+    private List<Object[]> findValidatedUsersOverTime() {
+        Query query = em.createNamedQuery("User.findValidatedUsersOverTime");
+        return query.getResultList();
     }
 
 }

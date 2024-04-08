@@ -3,8 +3,11 @@ package paj.project5_vc.entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Set;
 
+import org.hibernate.annotations.CreationTimestamp;
 import paj.project5_vc.enums.UserRole;
 
 @Entity
@@ -23,6 +26,8 @@ import paj.project5_vc.enums.UserRole;
 @NamedQuery(name = "User.findTotalPagesActiveUserCount", query = "SELECT FUNCTION('CEIL', COUNT(u) / :pageSize) FROM UserEntity u WHERE u.deleted = false")
 @NamedQuery(name = "User.findTotalUsersCountByRole", query = "SELECT COUNT(u) FROM UserEntity u WHERE u.deleted = false AND u.role = :role")
 @NamedQuery(name = "User.findTotalPagesCountByRole", query = "SELECT FUNCTION('CEIL', COUNT(u) / :pageSize) FROM UserEntity u WHERE u.deleted = false AND u.role = :role")
+@NamedQuery(name = "User.findValidatedUsersOverTime", query = "SELECT DATE(u.validatedAt), COUNT(u) " +
+                "FROM UserEntity u WHERE u.deleted = false AND u.validated = true GROUP BY DATE(u.validatedAt) ORDER BY DATE(u.validatedAt)")
 
 
 public class UserEntity implements Serializable {
@@ -60,6 +65,10 @@ public class UserEntity implements Serializable {
 
     @Column(name = "validated", nullable = false)
     private boolean validated;
+
+    @CreationTimestamp
+    @Column(name = "validated_at", nullable = false)
+    private Timestamp validatedAt;
 
     @Column(name = "role", nullable = false)
     private int role;
@@ -162,6 +171,14 @@ public class UserEntity implements Serializable {
 
     public void setValidated(boolean validated) {
         this.validated = validated;
+    }
+
+    public Timestamp getValidatedAt() {
+        return validatedAt;
+    }
+
+    public void setValidatedAt(Timestamp validatedAt) {
+        this.validatedAt = validatedAt;
     }
 
     public Set<TokenEntity> getTokens() {

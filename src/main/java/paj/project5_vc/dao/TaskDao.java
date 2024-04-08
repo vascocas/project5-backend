@@ -5,10 +5,10 @@ import paj.project5_vc.entity.UserEntity;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.TypedQuery;
 import paj.project5_vc.enums.TaskState;
 
 import java.util.ArrayList;
+
 
 @Stateless
 public class TaskDao extends AbstractDao<TaskEntity> {
@@ -116,6 +116,15 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         try {
             return (ArrayList<TaskEntity>) em.createNamedQuery("Task.countTasksByStatus")
                     .getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Double findAverageCompletionTime() {
+        try {
+            return (Double) em.createNamedQuery("Task.findAverageCompletionTime")
+                    .getSingleResult();
         } catch (Exception e) {
             return null;
         }
