@@ -9,7 +9,7 @@ import java.util.Properties;
 public class EmailService {
     private static final long serialVersionUID = 1L;
 
-    private static final String SMTP_HOST = "smtp.example.com"; // Update with your SMTP server host
+    private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587"; // Update with your SMTP server port
     private static final String SMTP_USERNAME = "your-email@example.com"; // Update with your SMTP username
     private static final String SMTP_PASSWORD = "your-email-password"; // Update with your SMTP password

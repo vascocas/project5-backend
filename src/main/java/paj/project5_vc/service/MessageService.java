@@ -82,7 +82,7 @@ public class MessageService {
         if (messageDto.getMessageText() == null || messageDto.getMessageText().trim().isEmpty()) {
             return Response.status(400).entity("Message text cannot be empty").build();
         }
-        if (messageBean.sendMessage(messageDto)) {
+        if (messageBean.sendMessage(token, messageDto)) {
             return Response.status(200).entity("Message sent!").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
