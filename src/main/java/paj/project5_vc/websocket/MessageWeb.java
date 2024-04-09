@@ -4,30 +4,36 @@ import jakarta.ejb.Singleton;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import java.io.IOException;
 import java.util.HashMap;
 
 @Singleton
-@ServerEndpoint("/websocket/notifier/{token}")
-public class Notifier {
+@ServerEndpoint("/websocket/message/{token}")
+public class MessageWeb {
+    private static final Logger logger = LogManager.getLogger(MessageWeb.class);
     HashMap<String, Session> sessions = new HashMap<String, Session>();
-
-    public void send(String token, String msg) {
+    
+    // Method for sending websocket messages
+    public void send(String msg, String token) {
         Session session = sessions.get(token);
         if (session != null) {
-            System.out.println("sending.......... " + msg);
+
             try {
                 session.getBasicRemote().sendText(msg);
+                // session.getBasicRemote().sendObject();
             } catch (IOException e) {
-                System.out.println("Something went wrong!");
+                logger.warn("Something went wrong!");
             }
         }
     }
 
     @OnOpen
     public void toDoOnOpen(Session session, @PathParam("token") String token) {
-        System.out.println("A new WebSocket session is opened for client with token:"+ token);
+        System.out.println("A new WebSocket session is opened for client with token: " + token);
         sessions.put(token, session);
     }
 

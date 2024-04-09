@@ -102,15 +102,6 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         }
     }
 
-    public Double getAverageTasksPerUser(int creatorId) {
-        try {
-            return (Double) em.createNamedQuery("Task.findAverageTasksPerUser")
-                    .setParameter("creatorId", creatorId)
-                    .getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     public ArrayList<TaskEntity> countTasksByStatus() {
         try {
@@ -121,12 +112,5 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         }
     }
 
-    public Double findAverageCompletionTime() {
-        try {
-            return (Double) em.createNamedQuery("Task.findAverageCompletionTime")
-                    .getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
-    }
+
 }
