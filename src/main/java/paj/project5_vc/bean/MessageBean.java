@@ -3,7 +3,7 @@ package paj.project5_vc.bean;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -12,14 +12,13 @@ import paj.project5_vc.dao.MessageDao;
 import paj.project5_vc.dao.NotificationDao;
 import paj.project5_vc.dao.UserDao;
 import paj.project5_vc.dto.MessageDto;
-import paj.project5_vc.dto.TaskDto;
 import paj.project5_vc.entity.MessageEntity;
 import paj.project5_vc.entity.NotificationEntity;
-import paj.project5_vc.entity.TaskEntity;
 import paj.project5_vc.entity.UserEntity;
 
 @Stateless
 public class MessageBean implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @EJB
     MessageDao messageDao;
@@ -27,6 +26,8 @@ public class MessageBean implements Serializable {
     NotificationDao notificationDao;
     @EJB
     UserDao userDao;
+
+   // private ObjectMapper objectMapper = new ObjectMapper();
 
     // Method for sending a message
     public boolean sendMessage(MessageDto messageDto) {
@@ -177,7 +178,7 @@ public class MessageBean implements Serializable {
 
     // (apply in websocket package)
     // Method for sending a message via websocket
-    public void sendMessageViaWebSocket(MessageEntity message, Session session) {
+   /* public void sendMessageViaWebSocket(MessageEntity message, Session session) {
         try {
             // Convert the message entity to JSON format
             String jsonMessage = convertMessageEntityToJson(message);
@@ -192,9 +193,13 @@ public class MessageBean implements Serializable {
 
     // (apply in websocket package)
     // Method to convert message entity to JSON format
-    private String convertMessageEntityToJson(MessageEntity message) {
-        // Implement logic to convert message entity to JSON format
+    /*private String convertMessageEntityToJson(MessageEntity message) {
+        // Convert MessageEntity to JSON format
         // You can use libraries like Gson or Jackson for JSON serialization
-        return ""; // Placeholder for JSON message
+        String jsonMessage = objectMapper.writeValueAsString(message);
+
+        return jsonMessage;
     }
+
+     */
 }

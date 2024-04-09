@@ -1,5 +1,7 @@
 package paj.project5_vc.bean;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import paj.project5_vc.dao.ConfigurationDao;
 import paj.project5_vc.dao.TaskDao;
 import paj.project5_vc.dao.TokenDao;
@@ -27,6 +29,8 @@ import java.util.Base64;
 public class UserBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger logger = LogManager.getLogger(UserBean.class);
 
     @EJB
     UserDao userDao;
@@ -82,6 +86,7 @@ public class UserBean implements Serializable {
                 successLogin.setUsername(username);
                 successLogin.setRole(userEntity.getRole());
                 successLogin.setPhoto(userEntity.getPhoto());
+                logger.warn("User " + username + " is successfully logged in @"+ Instant.now());
                 return successLogin;
             }
         }
@@ -115,6 +120,26 @@ public class UserBean implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public UserDto createUser(String token, UserDto user) {
+        UserEntity userEntity = userDao.findUserByToken(token);
+        if (userEntity != null) {
+            UserRole userRole = userEntity.getRole();
+            // Check if the user is a DEVELOPER or SCRUM_MASTER: cannot create user
+            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
+                // Check if a user with the provided username and email already exists
+                UserEntity userByUsername = userDao.findUserByUsername(user.getUsername());
+                UserEntity userByEmail = userDao.findUserByEmail(user.getEmail());
+                if ((userByUsername == null) && (userByEmail == null)) {
+                    UserEntity newUser = convertUserDtotoEntity(user);
+                    newUser.setRole(user.getRole());
+                    userDao.persist(newUser);
+                    return convertUserEntitytoUserDto(newUser);
+                }
+            }
+        }
+        return null;
     }
 
     public boolean logout(String token) {
@@ -315,25 +340,7 @@ public class UserBean implements Serializable {
         }
     }
 
-    public UserDto createUser(String token, UserDto user) {
-        UserEntity userEntity = userDao.findUserByToken(token);
-        if (userEntity != null) {
-            UserRole userRole = userEntity.getRole();
-            // Check if the user is a DEVELOPER or SCRUM_MASTER: cannot create user
-            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
-                // Check if a user with the provided username and email already exists
-                UserEntity userByUsername = userDao.findUserByUsername(user.getUsername());
-                UserEntity userByEmail = userDao.findUserByEmail(user.getEmail());
-                if ((userByUsername == null) && (userByEmail == null)) {
-                    UserEntity newUser = convertUserDtotoEntity(user);
-                    newUser.setRole(user.getRole());
-                    userDao.persist(newUser);
-                    return convertUserEntitytoUserDto(newUser);
-                }
-            }
-        }
-        return null;
-    }
+
 
     public UserTableDto getUsers(String token, UserRole role, String order, int page, int pageSize) {
         UserEntity userEntity = userDao.findUserByToken(token);

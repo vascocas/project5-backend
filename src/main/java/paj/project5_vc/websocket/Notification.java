@@ -9,14 +9,14 @@ import java.io.IOException;
 import java.util.HashMap;
 
 @Singleton
-@ServerEndpoint("/websocket/notifier/{token}")
-public class Notifier {
+@ServerEndpoint("/websocket/notification/{token}")
+public class Notification {
     HashMap<String, Session> sessions = new HashMap<String, Session>();
 
     public void send(String token, String msg) {
         Session session = sessions.get(token);
         if (session != null) {
-            System.out.println("sending.......... " + msg);
+            System.out.println("Testing websocket... " + msg);
             try {
                 session.getBasicRemote().sendText(msg);
             } catch (IOException e) {
