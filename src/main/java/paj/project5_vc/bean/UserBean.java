@@ -86,7 +86,7 @@ public class UserBean implements Serializable {
                 successLogin.setUsername(username);
                 successLogin.setRole(userEntity.getRole());
                 successLogin.setPhoto(userEntity.getPhoto());
-                logger.warn("User " + username + " is successfully logged in @"+ Instant.now());
+                logger.warn("User " + username + " is successfully logged in");
                 return successLogin;
             }
         }
@@ -475,7 +475,6 @@ public class UserBean implements Serializable {
         LoginDto loginDto = new LoginDto();
         loginDto.setId(user.getId());
         loginDto.setUsername(user.getUsername());
-        loginDto.setPassword(user.getPassword());
         loginDto.setRole(user.getRole());
         loginDto.setPhoto(user.getPhoto());
         return loginDto;

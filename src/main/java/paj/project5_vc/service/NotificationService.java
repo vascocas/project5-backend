@@ -25,12 +25,13 @@ public class NotificationService {
     // Endpoint to get user notifications
     @GET
     @Path("")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserNotifications(@HeaderParam("token") String token) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        ArrayList<NotificationDto> notifications = notificationBean.getUserNotifications(token);
+        ArrayList<NotificationDto> notifications =  notificationBean.getUserNotifications(token);
         return Response.status(200).entity(notifications).build();
     }
 
@@ -52,6 +53,7 @@ public class NotificationService {
     // Endpoint to mark a notification as read (by Id), and its previous
     @PUT
     @Path("/read/{notificationId}")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response markNotificationAsRead(@HeaderParam("token") String token, @PathParam("notificationId") int notificationId) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
@@ -66,6 +68,7 @@ public class NotificationService {
     // Endpoint to mark all user notifications as read
     @PUT
     @Path("/read")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response markAllUserNotificationsAsRead(@HeaderParam("token") String token) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();

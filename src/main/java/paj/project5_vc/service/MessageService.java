@@ -25,6 +25,7 @@ public class MessageService {
     // Endpoint to get all user messages
     @GET
     @Path("/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllMessagesUser(@HeaderParam("token") String token, @PathParam("userId") int userId) {
         if (!userBean.tokenExist(token)) {
@@ -37,6 +38,7 @@ public class MessageService {
     // Endpoint to get messages for a user (Received)
     @GET
     @Path("/received/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMessagesForUser(@HeaderParam("token") String token, @PathParam("userId") int userId) {
         if (!userBean.tokenExist(token)) {
@@ -49,6 +51,7 @@ public class MessageService {
     // Endpoint to get messages from a user (Sent)
     @GET
     @Path("/sent/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMessagesFromUser(@HeaderParam("token") String token, @PathParam("userId") int userId) {
         if (!userBean.tokenExist(token)) {
@@ -61,6 +64,7 @@ public class MessageService {
     // Endpoint to get chat messages
     @GET
     @Path("/chat/{senderId}/{receiverId}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getChatMessages(@HeaderParam("token") String token, @PathParam("senderId") int senderId, @PathParam("receiverId") int receiverId) {
         if (!userBean.tokenExist(token)) {
@@ -92,6 +96,7 @@ public class MessageService {
     // Endpoint to mark a message as read
     @PUT
     @Path("/read/{messageId}")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response markMessageAsRead(@HeaderParam("token") String token, @PathParam("messageId") int messageId) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
