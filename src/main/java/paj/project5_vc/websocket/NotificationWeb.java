@@ -6,6 +6,7 @@ import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import paj.project5_vc.dto.NotificationDto;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,39 +18,21 @@ public class NotificationWeb {
     private static final Logger logger = LogManager.getLogger(NotificationWeb.class);
     HashMap<String, Session> sessions = new HashMap<String, Session>();
 
-
     // Method for sending websocket notifications
-    public void send(@PathParam("token") String token, String msg) {
+    public void send(@PathParam("token") String token, NotificationDto notif) {
         Session session = sessions.get(token);
         if (session != null) {
-
             try {
-                session.getBasicRemote().sendText(msg);
-            } catch (IOException e) {
-                logger.warn("Something went wrong!");
+                session.getBasicRemote().sendObject(notif);
+            } catch (IOException | EncodeException e) {
+                logger.warn("Something went wrong!", e);
             }
         }
     }
-
-
-    // Method for handling incoming WebSocket notifications
-    public void handleMessageFromWebSocket(@PathParam("token") String token, String message) {
-        Session session = sessions.get(token);
-        if (session != null) {
-
-            try {
-                // Send confirmation back to the sender
-                session.getBasicRemote().sendText("Notification received and saved");
-            } catch (IOException e) {
-                logger.error("Error sending confirmation message: " + e.getMessage());
-            }
-        }
-    }
-
 
     @OnOpen
     public void toDoOnOpen(Session session, @PathParam("token") String token) {
-        System.out.println("A new WebSocket session is opened for client with token: " + token);
+        System.out.println("A new WebSocket session is opened for client");
         sessions.put(token, session);
     }
 

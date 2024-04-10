@@ -4,11 +4,13 @@ package paj.project5_vc.dto;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @XmlRootElement
-public class MessageDto {
+public class MessageDto implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     @XmlElement
     private int id;
     @XmlElement
@@ -84,6 +86,18 @@ public class MessageDto {
 
     public void setReceiverId(int receiverId) {
         this.receiverId = receiverId;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageDto{" +
+                "id=" + id +
+                ", messageText='" + messageText + '\'' +
+                ", sentTime=" + sentTime +
+                ", readStatus=" + readStatus +
+                ", senderId=" + senderId +
+                ", receiverId=" + receiverId +
+                '}';
     }
 }
 

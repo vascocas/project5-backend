@@ -2,15 +2,19 @@ package paj.project5_vc.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.*;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import paj.project5_vc.dao.MessageDao;
 import paj.project5_vc.dao.NotificationDao;
 import paj.project5_vc.dao.UserDao;
 import paj.project5_vc.dto.MessageDto;
+import paj.project5_vc.dto.NotificationDto;
 import paj.project5_vc.entity.MessageEntity;
 import paj.project5_vc.entity.NotificationEntity;
 import paj.project5_vc.entity.UserEntity;
@@ -20,6 +24,7 @@ import paj.project5_vc.websocket.NotificationWeb;
 @Stateless
 public class MessageBean implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MessageBean.class);
 
     @EJB
     MessageDao messageDao;
@@ -40,41 +45,44 @@ public class MessageBean implements Serializable {
         UserEntity sender = userDao.findUserById(messageDto.getSenderId());
         UserEntity receiver = userDao.findUserById(messageDto.getReceiverId());
         if (sender != null && receiver != null) {
+            // Persist the message
             MessageEntity message = new MessageEntity();
             message.setSender(sender);
             message.setReceiver(receiver);
             message.setMessageText(messageDto.getMessageText());
             message.setReadStatus(false);
             messageDao.persist(message);
-            // Serialize MessageDto to JSON string
-            ObjectMapper objectMapper = new ObjectMapper();
-            String jsonMessage;
-            try {
-                jsonMessage = objectMapper.writeValueAsString(messageDto);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace(); // Handle or log exception
-                return false; // Unable to serialize messageDto
-            }
-            // Send message over WebSocket
-            messageWeb.send(token, jsonMessage);
+
+            // Create and persist notification
             NotificationEntity notif = new NotificationEntity();
             notif.setRecipientUser(receiver);
-            notif.setContentText("New message from: <" + sender.getUsername()+">");
+            notif.setContentText("New message from: <" + sender.getUsername() + ">");
             notif.setReadStatus(false);
             notificationDao.persist(notif);
 
-            // Serialize MessageDto to JSON string
-            ObjectMapper objMapper = new ObjectMapper();
-            String jsMessage;
-            try {
-                jsMessage = objMapper.writeValueAsString(notif);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace(); // Handle or log exception
-                return false; // Unable to serialize messageDto
-            }
-            // Send message over WebSocket
-            notifWeb.send(token, jsMessage);
+            // Prepare return message DTO
+            MessageDto returnDto = new MessageDto();
+            returnDto.setReadStatus(message.isReadStatus());
+            returnDto.setMessageText(message.getMessageText());
+            returnDto.setReceiverId(message.getReceiver().getId());
+            returnDto.setSenderId(message.getSender().getId());
+            returnDto.setId(message.getId());
 
+            // Send message over WebSocket
+            messageWeb.send(token, returnDto);
+
+            // Prepare return notification DTO
+            NotificationDto notifDto = new NotificationDto();
+            notifDto.setReadStatus(notif.isReadStatus());
+            notifDto.setCreationTime(notif.getCreationTime());
+            notifDto.setRecipientId(notif.getRecipientUser().getId());
+            notifDto.setContentText(notif.getContentText());
+            notifDto.setId(notif.getId());
+
+            // Send notification over WebSocket
+            notifWeb.send(token, notifDto);
+
+            logger.warn("Message sent successfully");
             return true;
         }
         return false;
@@ -149,7 +157,7 @@ public class MessageBean implements Serializable {
         // Retrieve the user entity corresponding to the id
         UserEntity sender = userDao.findUserById(senderId);
         UserEntity receiver = userDao.findUserById(receiverId);
-        if (sender != null && receiver!= null) {
+        if (sender != null && receiver != null) {
             ArrayList<MessageEntity> messageEntities = messageDao.findChangedMessages(sender, receiver);
             // Convert MessageEntity objects to MessageDto objects
             ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);

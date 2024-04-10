@@ -3,10 +3,13 @@ package paj.project5_vc.dto;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @XmlRootElement
-public class NotificationDto {
+public class NotificationDto implements Serializable {
+
+    private static final long serialVersionUID = 1L; // Required for Serializable classes
 
     @XmlElement
     private int id;
@@ -24,7 +27,6 @@ public class NotificationDto {
     }
 
     // Constructor with parameters
-
     public NotificationDto(int id, Timestamp creationTime, String contentText, boolean readStatus, int recipientId) {
         this.id = id;
         this.creationTime = creationTime;
@@ -73,5 +75,16 @@ public class NotificationDto {
 
     public void setRecipientId(int recipientId) {
         this.recipientId = recipientId;
+    }
+
+    @Override
+    public String toString() {
+        return "NotificationDto{" +
+                "id=" + id +
+                ", creationTime=" + creationTime +
+                ", contentText='" + contentText + '\'' +
+                ", readStatus=" + readStatus +
+                ", recipientId=" + recipientId +
+                '}';
     }
 }
