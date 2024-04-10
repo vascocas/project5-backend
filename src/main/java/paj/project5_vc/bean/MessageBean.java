@@ -54,7 +54,7 @@ public class MessageBean implements Serializable {
             // Create and persist notification
             NotificationEntity notif = new NotificationEntity();
             notif.setRecipientUser(receiver);
-            notif.setContentText("New message from: <" + sender.getUsername() + ">");
+            notif.setContentText("New message from: " + sender.getUsername());
             notif.setReadStatus(false);
             notificationDao.persist(notif);
 
