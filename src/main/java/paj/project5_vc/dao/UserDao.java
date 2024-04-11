@@ -6,6 +6,7 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
 import paj.project5_vc.enums.UserRole;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.Timestamp;
@@ -157,18 +158,17 @@ public class UserDao extends AbstractDao<UserEntity> {
         }
     }
 
-    public List<Object[]> getUsersOverTime() {
-        // Query to retrieve user registration dates, grouped by day
-        String query = "SELECT DATE(u.validatedAt), COUNT(u.id) " +
-                "FROM UserEntity u " +
-                "WHERE u.deleted = false " +
-                "GROUP BY DATE(u.validatedAt)";
-
-        // Execute the query and retrieve results
-        List<Object[]> results = em.createQuery(query).getResultList();
-
-        return results;
+    public int findTotalUsersCountByDayValidatedAt(LocalDate validatedAt) {
+        try {
+            return em.createNamedQuery("User.findTotalUsersCountByValidatedAt", Long.class)
+                    .setParameter("validatedAtParam", validatedAt)
+                    .getSingleResult()
+                    .intValue();
+        } catch (NoResultException e) {
+            return 0; // Return 0 if no users found for the validatedAt timestamp
+        }
     }
+
 
 }
 

@@ -19,13 +19,13 @@ public class NotificationWeb {
     HashMap<String, Session> sessions = new HashMap<String, Session>();
 
     // Method for sending websocket notifications
-    public void send(@PathParam("token") String token, NotificationDto notif) {
+    public void send(@PathParam("token") String token, String notifDto) {
         Session session = sessions.get(token);
         if (session != null) {
             try {
-                session.getBasicRemote().sendObject(notif);
-            } catch (IOException | EncodeException e) {
-                logger.warn("Something went wrong!", e);
+                session.getBasicRemote().sendText(notifDto);
+            } catch (IOException e) {
+                logger.warn("Error sending WebSocket notification", e);
             }
         }
     }

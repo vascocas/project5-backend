@@ -20,6 +20,8 @@ public class MessageDto implements Serializable {
     @XmlElement
     private boolean readStatus;
     @XmlElement
+    private int chatId;
+    @XmlElement
     private int senderId;
     @XmlElement
     private int receiverId;
@@ -29,11 +31,12 @@ public class MessageDto implements Serializable {
     }
 
     // Constructor with parameters
-    public MessageDto(int id, String messageText, Timestamp sentTime, boolean readStatus, int senderId, int receiverId) {
+    public MessageDto(int id, String messageText, Timestamp sentTime, boolean readStatus, int chatId, int senderId, int receiverId) {
         this.id = id;
         this.messageText = messageText;
         this.sentTime = sentTime;
         this.readStatus = readStatus;
+        this.chatId = chatId;
         this.senderId = senderId;
         this.receiverId = receiverId;
     }
@@ -70,6 +73,14 @@ public class MessageDto implements Serializable {
 
     public void setReadStatus(boolean readStatus) {
         this.readStatus = readStatus;
+    }
+
+    public int getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(int chatId) {
+        this.chatId = chatId;
     }
 
     public int getSenderId() {

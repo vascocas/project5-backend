@@ -7,6 +7,7 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
 import paj.project5_vc.enums.TaskState;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 
@@ -122,20 +123,6 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         }
     }
 
-    /*
-    public int getTasksCompletedOverTime() {
-        try {
-            // Query to retrieve cumulative count of completed tasks over time, grouped by day
-            Long compTasks = (Long) em.createNamedQuery("Task.countTasksByDay")
-                    .getSingleResult();
-            return compTasks.intValue();
-        } catch (NoResultException e) {
-            return 0;
-        }
-    }
-
-     */
-
     public int getTasksCompletedOverTime(TaskState taskState) {
         try {
             // Query to retrieve cumulative count of completed tasks over time for a specific state, grouped by day
@@ -147,5 +134,17 @@ public class TaskDao extends AbstractDao<TaskEntity> {
             return 0;
         }
     }
+
+    public int countCompletedTasksByDate(LocalDate completedDate) {
+        try {
+            return em.createNamedQuery("Task.countCompletedTasksByDate", Long.class)
+                    .setParameter("dateParam", completedDate)
+                    .getSingleResult()
+                    .intValue();
+        } catch (NoResultException e) {
+            return 0; // Return 0 if no tasks found for the completed date
+        }
+    }
+
 
 }

@@ -3,8 +3,11 @@ package paj.project5_vc.dao;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
 import paj.project5_vc.entity.MessageEntity;
+
 import java.sql.Timestamp;
+
 import paj.project5_vc.entity.UserEntity;
+
 import java.util.ArrayList;
 
 
@@ -29,9 +32,10 @@ public class MessageDao extends AbstractDao<MessageEntity> {
     }
 
     // Method to find previous messages based on sentTime
-    public ArrayList<MessageEntity> findPreviousMessages(Timestamp sentTime) {
+    public ArrayList<MessageEntity> findPreviousMessages(int userId, Timestamp sentTime) {
         try {
             return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findPreviousMessages")
+                    .setParameter("chatId", userId)
                     .setParameter("sentTime", sentTime)
                     .getResultList();
         } catch (NoResultException e) {
@@ -82,5 +86,17 @@ public class MessageDao extends AbstractDao<MessageEntity> {
             return null;
         }
     }
+
+    // Method to find all messages by chatId
+    public ArrayList<MessageEntity> findAllMessagesByChatId(int chatId) {
+        try {
+            return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findAllMessagesByChatId")
+                    .setParameter("chatId", chatId)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
 
 }

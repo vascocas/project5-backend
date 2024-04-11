@@ -25,6 +25,8 @@ import paj.project5_vc.enums.UserRole;
 @NamedQuery(name = "User.findTotalPagesActiveUserCount", query = "SELECT FUNCTION('CEIL', COUNT(u) / :pageSize) FROM UserEntity u WHERE u.deleted = false")
 @NamedQuery(name = "User.findTotalUsersCountByRole", query = "SELECT COUNT(u) FROM UserEntity u WHERE u.deleted = false AND u.role = :role")
 @NamedQuery(name = "User.findTotalPagesCountByRole", query = "SELECT FUNCTION('CEIL', COUNT(u) / :pageSize) FROM UserEntity u WHERE u.deleted = false AND u.role = :role")
+@NamedQuery(name = "User.findTotalUsersCountByValidatedAt", query = "SELECT COUNT(u) FROM UserEntity u WHERE u.deleted = false AND DAY(u.validatedAt) = DAY(:validatedAtParam)")
+
 
 
 public class UserEntity implements Serializable {

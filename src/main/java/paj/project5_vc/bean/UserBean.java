@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 
 
-
 @Stateless
 public class UserBean implements Serializable {
 
@@ -147,6 +146,7 @@ public class UserBean implements Serializable {
         if (u != null) {
             TokenEntity t = tokenDao.findTokenByValue(token);
             t.setTokenValue(null);
+            tokenDao.remove(t);
             return true;
         }
         return false;
@@ -339,7 +339,6 @@ public class UserBean implements Serializable {
             return new ArrayList<>();
         }
     }
-
 
 
     public UserTableDto getUsers(String token, UserRole role, String order, int page, int pageSize) {

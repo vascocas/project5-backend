@@ -19,12 +19,12 @@ public class MessageWeb {
     HashMap<String, Session> sessions = new HashMap<String, Session>();
 
     // Method for sending websocket messages
-    public void send(@PathParam("token") String token, MessageDto msg) {
+    public void send(@PathParam("token") String token, String msgDto) {
         Session session = sessions.get(token);
         if (session != null) {
             try {
-                session.getBasicRemote().sendObject(msg);
-            } catch (IOException | EncodeException e) {
+                session.getBasicRemote().sendText(msgDto);
+            } catch (IOException e) {
                 logger.warn("Something went wrong!", e);
             }
         }

@@ -63,14 +63,14 @@ public class MessageService {
 
     // Endpoint to get chat messages
     @GET
-    @Path("/chat/{senderId}/{receiverId}")
+    @Path("/chat/{loggedId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getChatMessages(@HeaderParam("token") String token, @PathParam("senderId") int senderId, @PathParam("receiverId") int receiverId) {
+    public Response getChatMessages(@HeaderParam("token") String token, @PathParam("loggedId") int loggedId) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        ArrayList<MessageDto> messages = messageBean.getChatMessages(senderId, receiverId);
+        ArrayList<MessageDto> messages = messageBean.getChatMessages(loggedId);
         return Response.status(200).entity(messages).build();
     }
 
@@ -101,7 +101,7 @@ public class MessageService {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        if (messageBean.markMessageAsRead(messageId)) {
+        if (messageBean.markMessageAsRead(token, messageId)) {
             return Response.status(200).entity("Messages marked as read!").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
