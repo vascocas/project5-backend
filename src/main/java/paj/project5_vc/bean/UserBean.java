@@ -428,6 +428,22 @@ public class UserBean implements Serializable {
         return false;
     }
 
+    public double getAverageTasksPerUser(String token) {
+        UserEntity userEntity = userDao.findUserByToken(token);
+        if (userEntity != null) {
+            UserRole userRole = userEntity.getRole();
+            // Check user role: DEVELOPER or SCRUM_MASTER
+            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
+                int totalUsers = userDao.findTotalUserCountbyActive();
+                int totalTasks = taskDao.countTotalTasks();
+                if (totalUsers > 0) {
+                    return (double) totalTasks / totalUsers;
+                }
+            }
+        }
+        return 0;
+    }
+
     private UserEntity convertUserDtotoEntity(UserDto user) {
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(user.getUsername());

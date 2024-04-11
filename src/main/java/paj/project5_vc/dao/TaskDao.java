@@ -83,6 +83,16 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         }
     }
 
+    public int countTotalTasks() {
+        try {
+            return em.createNamedQuery("Task.countTotalTasks", Long.class)
+                    .getSingleResult()
+                    .intValue();
+        } catch (NoResultException e) {
+            return 0;
+        }
+    }
+
     public ArrayList<TaskEntity> findTasksByDeleted() {
         try {
             ArrayList<TaskEntity> taskEntityEntities = (ArrayList<TaskEntity>) em.createNamedQuery("Task.findTasksByDeleted").setParameter("deleted", true).getResultList();
@@ -112,5 +122,30 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         }
     }
 
+    /*
+    public int getTasksCompletedOverTime() {
+        try {
+            // Query to retrieve cumulative count of completed tasks over time, grouped by day
+            Long compTasks = (Long) em.createNamedQuery("Task.countTasksByDay")
+                    .getSingleResult();
+            return compTasks.intValue();
+        } catch (NoResultException e) {
+            return 0;
+        }
+    }
+
+     */
+
+    public int getTasksCompletedOverTime(TaskState taskState) {
+        try {
+            // Query to retrieve cumulative count of completed tasks over time for a specific state, grouped by day
+            Long compTasks = (Long) em.createNamedQuery("Task.countTasksByDayAndState")
+                    .setParameter("state", taskState.getValue())
+                    .getSingleResult();
+            return compTasks.intValue();
+        } catch (NoResultException e) {
+            return 0;
+        }
+    }
 
 }

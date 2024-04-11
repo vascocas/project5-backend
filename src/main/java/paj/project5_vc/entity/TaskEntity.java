@@ -18,6 +18,11 @@ import java.time.LocalDate;
 @NamedQuery(name = "Task.findTotalTasksByUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.deleted = false")
 @NamedQuery(name = "Task.findTotalTasksByStateAndUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.state = :state AND t.deleted = false")
 @NamedQuery(name = "Task.countTasksByStatus", query = "SELECT t.state, COUNT(t) AS taskCount FROM TaskEntity t WHERE t.deleted = false GROUP BY t.state")
+@NamedQuery(name = "Task.countTotalTasks", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.deleted = false")
+@NamedQuery(name = "Task.countTasksByDayAndState", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.state = :state AND t.deleted = false GROUP BY FUNCTION('DATE', t.completedDate)")
+
+//@NamedQuery(name = "Task.countTasksByDay", query = "SELECT DATE(t.completedDate), COUNT(t.id) FROM TaskEntity t WHERE t.deleted = false AND t.state = :completedState " +
+//      "GROUP BY DATE(t.completedDate) ORDER BY DATE(t.completedDate)")
 
 
 

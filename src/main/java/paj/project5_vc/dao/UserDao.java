@@ -157,20 +157,17 @@ public class UserDao extends AbstractDao<UserEntity> {
         }
     }
 
-    // Verificar método
-    public void processValidatedUsersOverTime() {
-        List<Object[]> validatedUsersOverTime = findValidatedUsersOverTime();
-        for (Object[] result : validatedUsersOverTime) {
-            Timestamp validatedAt = (Timestamp) result[0];
-            long userCount = (long) result[1];
-            // Process each data point (validatedAt, userCount)
-            System.out.println("Validated At: " + validatedAt + ", User Count: " + userCount);
-        }
-    }
+    public List<Object[]> getUsersOverTime() {
+        // Query to retrieve user registration dates, grouped by day
+        String query = "SELECT DATE(u.validatedAt), COUNT(u.id) " +
+                "FROM UserEntity u " +
+                "WHERE u.deleted = false " +
+                "GROUP BY DATE(u.validatedAt)";
 
-    private List<Object[]> findValidatedUsersOverTime() {
-        Query query = em.createNamedQuery("User.findValidatedUsersOverTime");
-        return query.getResultList();
+        // Execute the query and retrieve results
+        List<Object[]> results = em.createQuery(query).getResultList();
+
+        return results;
     }
 
 }

@@ -245,6 +245,34 @@ public class TaskBean implements Serializable {
         return false;
     }
 
+    public ArrayList<TaskDto> getCategoryTasksWithCumulativeSum(String token, int categoryId) {
+        // Get user role by token
+        UserEntity user = userDao.findUserByToken(token);
+        if (user != null) {
+            UserRole userRole = user.getRole();
+            // Check if the user is a SCRUM_MASTER or PRODUCT_OWNER
+            if (userRole == UserRole.SCRUM_MASTER || userRole == UserRole.PRODUCT_OWNER) {
+                CategoryEntity ctgEntity = categoryDao.findCategoryById(categoryId);
+                if (ctgEntity != null) {
+                    ArrayList<TaskEntity> tasks = taskDao.findTasksByCategoryId(ctgEntity.getId());
+                    if (tasks != null) {
+                        // Calculate cumulative sum
+                        int cumulativeSum = 0;
+                        ArrayList<TaskDto> taskDtos = new ArrayList<>();
+                        for (TaskEntity task : tasks) {
+                            // Convert TaskEntity to TaskDto and add to the list
+                            TaskDto taskDto = convertTaskFromEntityToDto(task);
+                            cumulativeSum++;
+                            //taskDto.setCumulativeSum(cumulativeSum);
+                            taskDtos.add(taskDto);
+                        }
+                        return taskDtos;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     private TaskDto convertTaskFromEntityToDto(TaskEntity t) {
         TaskDto taskDto = new TaskDto();
