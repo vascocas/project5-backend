@@ -26,4 +26,15 @@ public class TokenDao extends AbstractDao<TokenEntity> {
         }
     }
 
+    public ArrayList<TokenEntity> findAllTokensByUserId(int userId) {
+        try {
+            ArrayList<TokenEntity> tokensByUserId = (ArrayList<TokenEntity>) em.createNamedQuery("Token.findTokensByUserId")
+                    .setParameter("userId", userId)
+                    .getResultList();
+            return tokensByUserId;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

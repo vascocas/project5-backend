@@ -31,11 +31,12 @@ public class MessageDao extends AbstractDao<MessageEntity> {
         }
     }
 
-    // Method to find previous messages based on sentTime
-    public ArrayList<MessageEntity> findPreviousMessages(int userId, Timestamp sentTime) {
+    // Method to find previous chat messages based on sentTime
+    public ArrayList<MessageEntity> findPreviousChatMessages(int senderId, int receiverId, Timestamp sentTime) {
         try {
-            return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findPreviousMessages")
-                    .setParameter("chatId", userId)
+            return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findPreviousChatMessages")
+                    .setParameter("senderId", senderId)
+                    .setParameter("receiverId", receiverId)
                     .setParameter("sentTime", sentTime)
                     .getResultList();
         } catch (NoResultException e) {
@@ -75,28 +76,16 @@ public class MessageDao extends AbstractDao<MessageEntity> {
         }
     }
 
-    // Method to find messages changed between two users (sent messages)
-    public ArrayList<MessageEntity> findChangedMessages(UserEntity senderUser, UserEntity receiverUser) {
+    // Method to find messages changed between two users (sent/received messages)
+    public ArrayList<MessageEntity> findChangedMessages(int senderId, int receiverId) {
         try {
             return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findChangedMessages")
-                    .setParameter("sender", senderUser)
-                    .setParameter("receiver", receiverUser)
+                    .setParameter("senderId", senderId)
+                    .setParameter("receiverId", receiverId)
                     .getResultList();
         } catch (NoResultException e) {
             return null;
         }
     }
-
-    // Method to find all messages by chatId
-    public ArrayList<MessageEntity> findAllMessagesByChatId(int chatId) {
-        try {
-            return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findAllMessagesByChatId")
-                    .setParameter("chatId", chatId)
-                    .getResultList();
-        } catch (NoResultException e) {
-            return new ArrayList<>();
-        }
-    }
-
 
 }

@@ -45,39 +45,29 @@ public class MessageBean implements Serializable {
         UserEntity sender = userDao.findUserById(messageDto.getSenderId());
         UserEntity receiver = userDao.findUserById(messageDto.getReceiverId());
         if (sender != null && receiver != null) {
-            // Persist the message for chat senderId
+            // Create and persist the sent message
             MessageEntity message = new MessageEntity();
-            message.setSender(sender);
-            message.setReceiver(receiver);
             message.setMessageText(messageDto.getMessageText());
             message.setReadStatus(false);
-            message.setChatId(messageDto.getSenderId());
+            message.setSender(sender);
+            message.setReceiver(receiver);
             messageDao.persist(message);
 
             // Create and persist notification
             NotificationEntity notif = new NotificationEntity();
-            notif.setRecipientUser(receiver);
             notif.setContentText("New message from: " + sender.getUsername());
             notif.setReadStatus(false);
+            notif.setRecipientUser(receiver);
             notificationDao.persist(notif);
-
-            // Persist the message for chat senderId
-            MessageEntity returnEntity = new MessageEntity();
-            returnEntity.setReadStatus(false);
-            returnEntity.setMessageText(messageDto.getMessageText());
-            returnEntity.setSender(sender);
-            returnEntity.setReceiver(receiver);
-            returnEntity.setChatId(messageDto.getReceiverId());
-            messageDao.persist(returnEntity);
 
             // Prepare return message DTO
             MessageDto returnDto = new MessageDto();
-            returnDto.setReadStatus(returnEntity.isReadStatus());
-            returnDto.setMessageText(returnEntity.getMessageText());
-            returnDto.setReceiverId(returnEntity.getReceiver().getId());
-            returnDto.setSenderId(returnEntity.getSender().getId());
-            returnDto.setId(returnEntity.getId());
-            returnDto.setChatId(returnEntity.getChatId());
+            returnDto.setId(message.getId());
+            returnDto.setSentTime(message.getSentTime());
+            returnDto.setMessageText(message.getMessageText());
+            returnDto.setReadStatus(message.isReadStatus());
+            returnDto.setSenderId(message.getSender().getId());
+            returnDto.setReceiverId(message.getReceiver().getId());
 
             // Convert message DTO to JSON
             ObjectMapper objectMapper = new ObjectMapper();
@@ -91,15 +81,15 @@ public class MessageBean implements Serializable {
             }
 
             // Send message over WebSocket
-            messageWeb.send(token, messageJson);
+            messageWeb.send(token, returnDto.getReceiverId(), messageJson);
 
             // Prepare return notification DTO
             NotificationDto notifDto = new NotificationDto();
-            notifDto.setReadStatus(notif.isReadStatus());
-            notifDto.setCreationTime(notif.getCreationTime());
-            notifDto.setRecipientId(notif.getRecipientUser().getId());
-            notifDto.setContentText(notif.getContentText());
             notifDto.setId(notif.getId());
+            notifDto.setCreationTime(notif.getCreationTime());
+            notifDto.setReadStatus(notif.isReadStatus());
+            notifDto.setContentText(notif.getContentText());
+            notifDto.setRecipientId(notif.getRecipientUser().getId());
 
             // Convert notification DTO to JSON
             String notificationJson;
@@ -121,20 +111,20 @@ public class MessageBean implements Serializable {
     }
 
     // Method for marking a message as read
-    public boolean markMessageAsRead(String token, int messageId) {
-        UserEntity user = userDao.findUserByToken(token);
-        if (user != null) {
-            MessageEntity message = messageDao.findById(messageId);
+    public boolean markMessageAsRead(int messageId) {
+        MessageEntity message = messageDao.findById(messageId);
             if (message != null) {
-                // Fetch all previous messages based on sentTime
-                ArrayList<MessageEntity> previousMessages = messageDao.findPreviousMessages(user.getId(), message.getSentTime());
+                int senderId = message.getSender().getId();
+                int receiverId = message.getReceiver().getId();
+                ArrayList<MessageEntity> previousMessages = messageDao.findPreviousChatMessages(senderId, receiverId, message.getSentTime());
                 // Mark all previous messages as read
                 for (MessageEntity prevMessage : previousMessages) {
-                    prevMessage.setReadStatus(true);
+                    if(prevMessage.getReceiver().getId() == message.getReceiver().getId()) {
+                        prevMessage.setReadStatus(true);
+                    }
                 }
                 return true;
             }
-        }
         return false;
     }
 
@@ -187,8 +177,8 @@ public class MessageBean implements Serializable {
     }
 
     // Method for fetching chat messages
-    public ArrayList<MessageDto> getChatMessages(int senderId) {
-        ArrayList<MessageEntity> messageEntities = messageDao.findAllMessagesByChatId(senderId);
+    public ArrayList<MessageDto> getChatMessages(int senderId, int receiverId) {
+        ArrayList<MessageEntity> messageEntities = messageDao.findChangedMessages(senderId, receiverId);
         // Convert MessageEntity objects to MessageDto objects
         ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);
         return messages;
@@ -203,7 +193,6 @@ public class MessageBean implements Serializable {
         messageDto.setSenderId(messageEntity.getSender().getId());
         messageDto.setReceiverId(messageEntity.getReceiver().getId());
         messageDto.setReadStatus(messageEntity.isReadStatus());
-        messageDto.setChatId(messageEntity.getChatId());
         return messageDto;
     }
 

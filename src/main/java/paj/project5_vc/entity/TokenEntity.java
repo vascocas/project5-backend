@@ -9,6 +9,8 @@ import java.time.Instant;
 @Entity
 @Table(name = "token")
 @NamedQuery(name = "Token.findTokenByValue", query = "SELECT t FROM TokenEntity t WHERE t.tokenValue = :tokenValue")
+@NamedQuery(name = "Token.findTokensByUserId", query = "SELECT t FROM TokenEntity t WHERE t.user.id = :userId")
+
 
 public class TokenEntity implements Serializable {
     private static final long serialVersionUID = 1L;
