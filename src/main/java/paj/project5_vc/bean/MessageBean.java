@@ -32,10 +32,8 @@ public class MessageBean implements Serializable {
     NotificationDao notificationDao;
     @EJB
     UserDao userDao;
-
     @Inject
     MessageWeb messageWeb;
-
     @Inject
     NotificationWeb notifWeb;
 
@@ -102,9 +100,7 @@ public class MessageBean implements Serializable {
             }
 
             // Send notification over WebSocket
-            notifWeb.send(token, notificationJson);
-
-            logger.warn("Message sent successfully");
+            notifWeb.send(token, notifDto.getRecipientId(), notificationJson);
             return true;
         }
         return false;

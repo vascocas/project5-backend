@@ -1,5 +1,11 @@
 package paj.project5_vc.bean;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
+import jakarta.xml.bind.annotation.XmlElement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import paj.project5_vc.dao.CategoryDao;
 import paj.project5_vc.dao.TaskDao;
 import paj.project5_vc.dao.UserDao;
@@ -8,21 +14,23 @@ import paj.project5_vc.dto.TaskStateDto;
 import paj.project5_vc.entity.CategoryEntity;
 import paj.project5_vc.entity.TaskEntity;
 import paj.project5_vc.entity.UserEntity;
+import paj.project5_vc.enums.TaskPriority;
 import paj.project5_vc.enums.TaskState;
 import paj.project5_vc.enums.UserRole;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
+import paj.project5_vc.websocket.TaskWeb;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 
-
 @Stateless
 public class TaskBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(TaskBean.class);
 
     @EJB
     TaskDao taskDao;
@@ -30,6 +38,8 @@ public class TaskBean implements Serializable {
     UserDao userDao;
     @EJB
     CategoryDao categoryDao;
+    @Inject
+    TaskWeb taskWeb;
 
     public TaskBean() {
     }
@@ -69,6 +79,27 @@ public class TaskBean implements Serializable {
                 TaskEntity t = taskDao.findTaskById(id);
                 if (t != null) {
                     t.setDeleted(true);
+                    // Prepare return Task Dto
+                    TaskDto returnDto = new TaskDto();
+                    returnDto.setId(t.getId());
+                    returnDto.setTitle(t.getTitle());
+                    returnDto.setDescription(t.getDescription());
+                    returnDto.setPriority(t.getPriority());
+                    returnDto.setDeleted(t.isDeleted());
+                    returnDto.setCreator(t.getCreator().getUsername());
+                    returnDto.setState(t.getState());
+                    returnDto.setCategory(t.getCategory().getCategoryName());
+                    // Convert message DTO to JSON
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String removeJson;
+                    try {
+                        removeJson = objectMapper.writeValueAsString(returnDto);
+                        logger.warn("Task webSocket sent successfully");
+                    } catch (JsonProcessingException e) {
+                        logger.error("Error converting message DTO to JSON", e);
+                        return false;
+                    }
+                    taskWeb.deleteTask(removeJson);
                     return true;
                 }
             }
@@ -240,6 +271,23 @@ public class TaskBean implements Serializable {
                 t.setCompletedDate(LocalDate.now()); // Set the completion date
             }
             t.setState(newState); // Update the task state
+
+            // Prepare return Task State Dto
+            TaskStateDto returnDto = new TaskStateDto();
+            returnDto.setId(newStatus.getId());
+            returnDto.setState(newStatus.getState());
+
+            // Convert message DTO to JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            String statusJson;
+            try {
+                statusJson = objectMapper.writeValueAsString(returnDto);
+                logger.warn("Task webSocket sent successfully");
+            } catch (JsonProcessingException e) {
+                logger.error("Error converting message DTO to JSON", e);
+                return false;
+            }
+            taskWeb.moveTask(statusJson);
             return true;
         }
         return false;
