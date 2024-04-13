@@ -7,6 +7,8 @@ import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import paj.project5_vc.dto.TaskDto;
+import paj.project5_vc.dto.TaskStateDto;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,25 +21,25 @@ public class TaskWeb {
     HashMap<String, Session> sessions = new HashMap<>();
 
 
-    public void moveTask(String stateDto) {
+    public void moveTask(TaskStateDto stateDto) {
         // Iterate over all sessions
         for (Session s : sessions.values()) {
             try {
                 // Send the message to the session
-                s.getBasicRemote().sendText(stateDto);
-            } catch (IOException e) {
+                s.getBasicRemote().sendObject(stateDto);
+            } catch (IOException | EncodeException e) {
                 logger.warn("Something went wrong while sending stateDto", e);
             }
         }
     }
 
-    public void deleteTask(String stateDto) {
+    public void deleteTask(TaskDto taskDto) {
         // Iterate over all sessions
         for (Session s : sessions.values()) {
             try {
                 // Send the message to the session
-                s.getBasicRemote().sendText(stateDto);
-            } catch (IOException e) {
+                s.getBasicRemote().sendObject(taskDto);
+            } catch (IOException | EncodeException e) {
                 logger.warn("Something went wrong while sending stateDto", e);
             }
         }

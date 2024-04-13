@@ -84,22 +84,14 @@ public class TaskBean implements Serializable {
                     returnDto.setId(t.getId());
                     returnDto.setTitle(t.getTitle());
                     returnDto.setDescription(t.getDescription());
+                    returnDto.setStartDate(t.getStartDate());
+                    returnDto.setEndDate(t.getEndDate());
                     returnDto.setPriority(t.getPriority());
                     returnDto.setDeleted(t.isDeleted());
                     returnDto.setCreator(t.getCreator().getUsername());
                     returnDto.setState(t.getState());
                     returnDto.setCategory(t.getCategory().getCategoryName());
-                    // Convert message DTO to JSON
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    String removeJson;
-                    try {
-                        removeJson = objectMapper.writeValueAsString(returnDto);
-                        logger.warn("Task webSocket sent successfully");
-                    } catch (JsonProcessingException e) {
-                        logger.error("Error converting message DTO to JSON", e);
-                        return false;
-                    }
-                    taskWeb.deleteTask(removeJson);
+                    taskWeb.deleteTask(returnDto);
                     return true;
                 }
             }
@@ -276,18 +268,7 @@ public class TaskBean implements Serializable {
             TaskStateDto returnDto = new TaskStateDto();
             returnDto.setId(newStatus.getId());
             returnDto.setState(newStatus.getState());
-
-            // Convert message DTO to JSON
-            ObjectMapper objectMapper = new ObjectMapper();
-            String statusJson;
-            try {
-                statusJson = objectMapper.writeValueAsString(returnDto);
-                logger.warn("Task webSocket sent successfully");
-            } catch (JsonProcessingException e) {
-                logger.error("Error converting message DTO to JSON", e);
-                return false;
-            }
-            taskWeb.moveTask(statusJson);
+            taskWeb.moveTask(returnDto);
             return true;
         }
         return false;

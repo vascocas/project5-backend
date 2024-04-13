@@ -67,19 +67,8 @@ public class MessageBean implements Serializable {
             returnDto.setSenderId(message.getSender().getId());
             returnDto.setReceiverId(message.getReceiver().getId());
 
-            // Convert message DTO to JSON
-            ObjectMapper objectMapper = new ObjectMapper();
-            String messageJson;
-            try {
-                messageJson = objectMapper.writeValueAsString(returnDto);
-                logger.warn("Message webSocket sent successfully");
-            } catch (JsonProcessingException e) {
-                logger.error("Error converting message DTO to JSON", e);
-                return false;
-            }
-
             // Send message over WebSocket
-            messageWeb.send(token, returnDto.getReceiverId(), messageJson);
+            messageWeb.send(token, returnDto.getReceiverId(), returnDto);
 
             // Prepare return notification DTO
             NotificationDto notifDto = new NotificationDto();
@@ -89,18 +78,8 @@ public class MessageBean implements Serializable {
             notifDto.setContentText(notif.getContentText());
             notifDto.setRecipientId(notif.getRecipientUser().getId());
 
-            // Convert notification DTO to JSON
-            String notificationJson;
-            try {
-                notificationJson = objectMapper.writeValueAsString(notifDto);
-                logger.warn("Notification webSocket sent successfully");
-            } catch (JsonProcessingException e) {
-                logger.error("Error converting notification DTO to JSON", e);
-                return false;
-            }
-
             // Send notification over WebSocket
-            notifWeb.send(token, notifDto.getRecipientId(), notificationJson);
+            notifWeb.send(token, notifDto.getRecipientId(), notifDto);
             return true;
         }
         return false;
