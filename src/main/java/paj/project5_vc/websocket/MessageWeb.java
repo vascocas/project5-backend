@@ -53,29 +53,15 @@ public class MessageWeb {
         }
     }
 
-
-        /*    Session session = sessions.get(token);
-        if (session != null) {
-            try {
-                session.getBasicRemote().sendText(msgDto);
-                session.getBasicRemote().sendText(msgDto);
-            } catch (IOException e) {
-                logger.warn("Something went wrong!", e);
-            }
-        }
-
-         */
-
-
     @OnOpen
     public void toDoOnOpen(Session session, @PathParam("token") String token) {
-        System.out.println("A new WebSocket session is opened for client");
+        logger.info("A new WebSocket session is opened for client");
         sessions.put(token, session);
     }
 
     @OnClose
     public void toDoOnClose(Session session, CloseReason reason) {
-        System.out.println("Websocket session is closed with CloseCode: " +
+        logger.info("Websocket session is closed with CloseCode: " +
                 reason.getCloseCode() + ": " + reason.getReasonPhrase());
         for (String key : sessions.keySet()) {
             if (sessions.get(key) == session)
@@ -85,11 +71,11 @@ public class MessageWeb {
 
     @OnMessage
     public void toDoOnMessage(Session session, String msg) {
-        System.out.println("A new message is received: " + msg);
+        logger.info("A new message is received: " + msg);
         try {
-            session.getBasicRemote().sendText("ack");
+            session.getBasicRemote().sendText("ok");
         } catch (IOException e) {
-            System.out.println("Something went wrong!");
+            logger.warn("Something went wrong!", e);
         }
     }
 }
