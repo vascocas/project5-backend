@@ -32,14 +32,10 @@ public class MessageBean implements Serializable {
     NotificationDao notificationDao;
     @EJB
     UserDao userDao;
-    @Inject
-    MessageWeb messageWeb;
-    @Inject
-    NotificationWeb notifWeb;
 
 
     // Method for sending a message
-    public boolean sendMessage(String token, MessageDto messageDto) {
+    public boolean sendMessage(MessageDto messageDto) {
         UserEntity sender = userDao.findUserById(messageDto.getSenderId());
         UserEntity receiver = userDao.findUserById(messageDto.getReceiverId());
         if (sender != null && receiver != null) {
@@ -57,29 +53,6 @@ public class MessageBean implements Serializable {
             notif.setReadStatus(false);
             notif.setRecipientUser(receiver);
             notificationDao.persist(notif);
-
-            // Prepare return message DTO
-            MessageDto returnDto = new MessageDto();
-            returnDto.setId(message.getId());
-            returnDto.setSentTime(message.getSentTime());
-            returnDto.setMessageText(message.getMessageText());
-            returnDto.setReadStatus(message.isReadStatus());
-            returnDto.setSenderId(message.getSender().getId());
-            returnDto.setReceiverId(message.getReceiver().getId());
-
-            // Send message over WebSocket
-            messageWeb.send(token, returnDto.getReceiverId(), returnDto);
-
-            // Prepare return notification DTO
-            NotificationDto notifDto = new NotificationDto();
-            notifDto.setId(notif.getId());
-            notifDto.setCreationTime(notif.getCreationTime());
-            notifDto.setReadStatus(notif.isReadStatus());
-            notifDto.setContentText(notif.getContentText());
-            notifDto.setRecipientId(notif.getRecipientUser().getId());
-
-            // Send notification over WebSocket
-            notifWeb.send(token, notifDto.getRecipientId(), notifDto);
             return true;
         }
         return false;
@@ -98,6 +71,7 @@ public class MessageBean implements Serializable {
                         prevMessage.setReadStatus(true);
                     }
                 }
+                logger.warn("Messages marked as read");
                 return true;
             }
         return false;

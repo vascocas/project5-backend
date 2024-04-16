@@ -11,6 +11,9 @@ import jakarta.ws.rs.core.Response;
 
 import paj.project5_vc.bean.UserBean;
 import paj.project5_vc.dto.MessageDto;
+import paj.project5_vc.websocket.MessageWeb;
+import paj.project5_vc.websocket.NotificationWeb;
+import paj.project5_vc.websocket.TaskWeb;
 
 @Path("/messages")
 public class MessageService {
@@ -21,6 +24,11 @@ public class MessageService {
     MessageBean messageBean;
     @EJB
     UserBean userBean;
+
+    @EJB
+    MessageWeb messageWeb;
+    @EJB
+    NotificationWeb notifWeb;
 
     // Endpoint to get all user messages
     @GET
@@ -86,7 +94,9 @@ public class MessageService {
         if (messageDto.getMessageText() == null || messageDto.getMessageText().trim().isEmpty()) {
             return Response.status(400).entity("Message text cannot be empty").build();
         }
-        if (messageBean.sendMessage(token, messageDto)) {
+        if (messageBean.sendMessage(messageDto)) {
+            messageWeb.send(messageDto.getReceiverId(),"MessagesChanged");
+            notifWeb.send(messageDto.getReceiverId(),"NotificationUpdate");
             return Response.status(200).entity("Message sent!").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();

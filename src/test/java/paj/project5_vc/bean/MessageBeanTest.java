@@ -34,10 +34,6 @@ class MessageBeanTest {
     @Mock
     NotificationDao notifDaoMock;
     @Mock
-    MessageWeb messageWebMock;
-    @Mock
-    NotificationWeb notifWebMock;
-    @Mock
     UserDao userDaoMock;
 
 
@@ -53,18 +49,15 @@ class MessageBeanTest {
         msgDto.setSenderId(senderUser.getId());
         msgDto.setReceiverId(receiverUser.getId());
         msgDto.setMessageText("Chat message test");
-        String myToken = "my_token";
 
         when(userDaoMock.findUserById(senderUser.getId())).thenReturn(senderUser);
         when(userDaoMock.findUserById(receiverUser.getId())).thenReturn(receiverUser);
 
         doNothing().when(messageDaoMock).persist(any(MessageEntity.class));
         doNothing().when(notifDaoMock).persist(any(NotificationEntity.class));
-        doNothing().when(messageWebMock).send(eq(myToken), eq(receiverUser.getId()), any(MessageDto.class));
-        doNothing().when(notifWebMock).send(eq(myToken), eq(receiverUser.getId()), any(NotificationDto.class));
 
         // when
-        boolean result = messageBean.sendMessage(myToken, msgDto);
+        boolean result = messageBean.sendMessage(msgDto);
 
         // then
         assertTrue(result);
@@ -73,9 +66,6 @@ class MessageBeanTest {
         verify(userDaoMock, times(2)).findUserById(anyInt());
         verify(messageDaoMock, times(1)).persist(any(MessageEntity.class));
         verify(notifDaoMock, times(1)).persist(any(NotificationEntity.class));
-        verify(messageWebMock, times(1)).send(eq(myToken), eq(receiverUser.getId()), any(MessageDto.class));
-        verify(notifWebMock, times(1)).send(eq(myToken), eq(receiverUser.getId()), any(NotificationDto.class));
-
     }
 
     @Test
@@ -89,13 +79,12 @@ class MessageBeanTest {
         msgDto.setSenderId(senderId);
         msgDto.setReceiverId(receiverUser.getId());
         msgDto.setMessageText("Chat message test");
-        String myToken = "my_token";
 
         when(userDaoMock.findUserById(senderId)).thenReturn(null);
         when(userDaoMock.findUserById(receiverUser.getId())).thenReturn(receiverUser);
 
         // when
-        boolean result = messageBean.sendMessage(myToken, msgDto);
+        boolean result = messageBean.sendMessage(msgDto);
 
         // then
         assertFalse(result);
@@ -104,8 +93,6 @@ class MessageBeanTest {
         verify(userDaoMock, times(2)).findUserById(anyInt());
         verifyNoInteractions(messageDaoMock);
         verifyNoInteractions(notifDaoMock);
-        verifyNoInteractions(messageWebMock);
-        verifyNoInteractions(notifWebMock);
     }
 
     @Test
@@ -119,13 +106,12 @@ class MessageBeanTest {
         msgDto.setSenderId(senderUser.getId());
         msgDto.setReceiverId(receiverId);
         msgDto.setMessageText("Chat message test");
-        String myToken = "my_token";
 
         when(userDaoMock.findUserById(senderUser.getId())).thenReturn(senderUser);
         when(userDaoMock.findUserById(receiverId)).thenReturn(null);
 
         // when
-        boolean result = messageBean.sendMessage(myToken, msgDto);
+        boolean result = messageBean.sendMessage(msgDto);
 
         // then
         assertFalse(result);
@@ -134,8 +120,6 @@ class MessageBeanTest {
         verify(userDaoMock, times(2)).findUserById(anyInt());
         verifyNoInteractions(messageDaoMock);
         verifyNoInteractions(notifDaoMock);
-        verifyNoInteractions(messageWebMock);
-        verifyNoInteractions(notifWebMock);
     }
 
     @Test

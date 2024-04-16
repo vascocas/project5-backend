@@ -167,6 +167,8 @@ public class TaskService {
         }
         TaskDto newTask = taskBean.addTask(token, task);
         if (newTask != null) {
+            System.out.println("Add new task");
+            taskWeb.taskChange(token, "TasksChanged");
             return Response.status(200).entity(newTask).build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
@@ -229,7 +231,8 @@ public class TaskService {
             return Response.status(400).entity("Invalid state").build();
         }
         if (taskBean.updateTaskStatus(newStatus)) {
-            taskWeb.moveTask(newStatus);
+            System.out.println("Move task");
+            taskWeb.taskChange(token, "TasksChanged");
             return Response.status(200).entity("Task status updated successfully").build();
         } else {
             return Response.status(404).entity("Task not found").build();
@@ -245,7 +248,8 @@ public class TaskService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (taskBean.removeTask(token, taskId)) {
-            taskWeb.deleteTask(taskId);
+            System.out.println("Delete task");
+            taskWeb.taskChange(token,"TasksChanged");
             return Response.status(200).entity("Task delete successfully").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();

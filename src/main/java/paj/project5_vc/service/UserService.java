@@ -210,6 +210,7 @@ public class UserService {
     @Path("/validate")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response validateUser(@HeaderParam("token") String token, RoleDto user) {
+        System.out.println("Estás aqui");
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }

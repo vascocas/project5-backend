@@ -27,7 +27,7 @@ public class NotificationWeb {
     HashMap<String, Session> sessions = new HashMap<String, Session>();
 
     // Method for sending websocket notifications
-    public void send(@PathParam("token") String token, int receiverId, NotificationDto notifDto) {
+    public void send(int receiverId, String notif) {
         // Retrieve the token entities associated with the receiver Id
         ArrayList<TokenEntity> receiverTokens = tokenDao.findAllTokensByUserId(receiverId);
         // Iterate over all sessions
@@ -40,8 +40,8 @@ public class NotificationWeb {
                         if (sessionToken != null && sessionToken.equals(t.getTokenValue())) {
                             try {
                                 // Send the notification to the session
-                                s.getBasicRemote().sendObject(notifDto);
-                            } catch (IOException | EncodeException e) {
+                                s.getBasicRemote().sendText(notif);
+                            } catch (IOException e) {
                                 logger.warn("Something went wrong while sending notification to receiver", e);
                             }
                         }

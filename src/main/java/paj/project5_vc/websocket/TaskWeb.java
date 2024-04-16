@@ -7,8 +7,6 @@ import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import paj.project5_vc.dto.TaskStateDto;
-import paj.project5_vc.dto.WebSocketMessage;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,30 +19,19 @@ public class TaskWeb {
     HashMap<String, Session> sessions = new HashMap<>();
 
 
-    public void moveTask(TaskStateDto stateDto) {
+    public void taskChange(String token, String taskAction) {
+        Session ownSession = sessions.get(token);
         // Iterate over all sessions
         for (Session s : sessions.values()) {
             try {
-                if(s.isOpen()) {
-                    // When sending a task update WebSocket message
-                    s.getBasicRemote().sendObject(new WebSocketMessage("update", stateDto));
+                if(s!=ownSession) {
+                    if (s.isOpen()) {
+                        // Send a task WebSocket message
+                        s.getBasicRemote().sendText(taskAction);
+                    }
                 }
-            } catch (IOException | EncodeException e) {
-                logger.warn("Something went wrong while sending stateDto", e);
-            }
-        }
-    }
-
-    public void deleteTask(int taskId) {
-        // Iterate over all sessions
-        for (Session s : sessions.values()) {
-            try {
-                if(s.isOpen()) {
-                    // When sending a task deletion WebSocket message
-                    s.getBasicRemote().sendObject(new WebSocketMessage("delete", taskId));
-                }
-            } catch (IOException | EncodeException e) {
-                logger.warn("Something went wrong while sending stateDto", e);
+            } catch (IOException e) {
+                logger.warn("Something went wrong while sending the message", e);
             }
         }
     }
@@ -66,34 +53,12 @@ public class TaskWeb {
     }
 
     @OnMessage
-    public void onMessage(String message) {
-        // Handle incoming websocket messages
-        if (message.equals("update")) {
-            // Handle logic for moving task
-            // Send updates to all active clients
-            broadcastUpdate(message);
-        } else if (message.equals("delete")) {
-            // Handle logic for deleting task
-            // Send updates to all active clients
-            broadcastDelete(message);
-        }
-    }
-
-    private void broadcastUpdate(String message) {
-        // Broadcast update message to all connected clients
-        for (Session s : sessions.values()) {
-            if (s.isOpen()) {
-                s.getAsyncRemote().sendText(message);
-            }
-        }
-    }
-
-    private void broadcastDelete(String message) {
-        // Broadcast delete message to all connected clients
-        for (Session s : sessions.values()) {
-            if (s.isOpen()) {
-                s.getAsyncRemote().sendText(message);
-            }
+    public void toDoOnMessage(Session session, String msg) {
+        logger.info("A new message is received: " + msg);
+        try {
+            session.getBasicRemote().sendText("ok");
+        } catch (IOException e) {
+            logger.warn("Something went wrong!", e);
         }
     }
 
