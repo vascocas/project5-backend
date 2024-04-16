@@ -7,9 +7,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import paj.project5_vc.bean.TaskBean;
 import paj.project5_vc.bean.UserBean;
+import paj.project5_vc.dto.CategoryTasksSummary;
 import paj.project5_vc.dto.TaskDto;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Path("/dashboard")
 public class DashboardService {
@@ -30,7 +32,12 @@ public class DashboardService {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        return Response.status(200).entity(userBean.getUsersCount(token)).build();
+        String userCountsJson = userBean.getUsersCount(token);
+        if (userCountsJson.isEmpty()) {
+            // Handle the case where the user is not authenticated or authorized
+            return Response.status(403).entity("User not authorized").build();
+        }
+        return Response.status(200).entity(userCountsJson).build();
     }
 
 
@@ -55,7 +62,12 @@ public class DashboardService {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        return Response.status(200).entity(taskBean.getCategoryTasksBySum(token)).build();
+        List<CategoryTasksSummary> categoryTasks = taskBean.getCategoryTasksBySum(token);
+        if (categoryTasks.isEmpty()) {
+            // Handle the case where the user is not authorized
+            return Response.status(403).entity("User not authorized").build();
+        }
+        return Response.status(200).entity(categoryTasks).build();
     }
 
 

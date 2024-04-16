@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import paj.project5_vc.dao.CategoryDao;
 import paj.project5_vc.dao.TaskDao;
 import paj.project5_vc.dao.UserDao;
+import paj.project5_vc.dto.CategoryTasksSummary;
 import paj.project5_vc.dto.TaskDto;
 import paj.project5_vc.dto.TaskStateDto;
 import paj.project5_vc.entity.CategoryEntity;
@@ -299,14 +300,22 @@ public class TaskBean implements Serializable {
     }
 
 
-    public List<Object[]> getCategoryTasksBySum(String token) {
+    public List<CategoryTasksSummary> getCategoryTasksBySum(String token) {
         // Get user role by token
         UserEntity user = userDao.findUserByToken(token);
         if (user != null) {
             UserRole userRole = user.getRole();
             // Check if the user is a PRODUCT_OWNER
             if (userRole == UserRole.PRODUCT_OWNER) {
-                return taskDao.countTasksByCategoryOrderedByCount();
+                List<Object[]> categoryTasks = taskDao.countTasksByCategoryOrderedByCount();
+                List<CategoryTasksSummary> categoryTaskSummaries = new ArrayList<>();
+                for (Object[] categoryTask : categoryTasks) {
+                    String category = (String) categoryTask[0];
+                    int taskCountSum = ((Number) categoryTask[1]).intValue();
+                    CategoryTasksSummary summary = new CategoryTasksSummary(category, taskCountSum);
+                    categoryTaskSummaries.add(summary);
+                }
+                return categoryTaskSummaries;
             }
         }
         return Collections.emptyList(); // Return an empty list if user is not authenticated or authorized

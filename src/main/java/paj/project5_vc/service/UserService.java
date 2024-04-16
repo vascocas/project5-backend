@@ -25,13 +25,11 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTokenTimerValue(@HeaderParam("token") String token) {
-        if (userBean.tokenExist(token)) {
-            TokenDto tokenDto = userBean.getTokenTimer();
-            return Response.status(200).entity(tokenDto).build();
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
         }
+        TokenDto tokenDto = userBean.getTokenTimer();
+        return Response.status(200).entity(tokenDto).build();
     }
 
     // Get UserDto by Id
@@ -40,13 +38,12 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEditProfile(@HeaderParam("token") String token, @QueryParam("userId") int userId) {
-        if (userBean.tokenExist(token)) {
-            UserDto user = userBean.getProfile(token, userId);
-            return Response.status(200).entity(user).build();
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
         }
+        UserDto user = userBean.getProfile(token, userId);
+        return Response.status(200).entity(user).build();
+
     }
 
     // Get list of usernames (Role dto)
@@ -56,7 +53,6 @@ public class UserService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsernameList(@HeaderParam("token") String token) {
         if (!userBean.tokenExist(token)) {
-            userBean.logout(token);
             return Response.status(401).entity("Invalid token").build();
         }
         ArrayList<RoleDto> usernames = userBean.getAllUsernames();
@@ -73,7 +69,6 @@ public class UserService {
                                 @QueryParam("page") int page,
                                 @QueryParam("pageSize") int pageSize) {
         if (!userBean.tokenExist(token)) {
-            userBean.logout(token);
             return Response.status(401).entity("Invalid Token!").build();
         }
         // Define default values if page number and page size <= 0
@@ -98,16 +93,14 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllDeletedUsers(@HeaderParam("token") String token) {
-        if (userBean.tokenExist(token)) {
-            ArrayList<UserManagmentDto> users = userBean.getDeletedUsers(token);
-            if (users != null) {
-                return Response.status(200).entity(users).build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
+        }
+        ArrayList<UserManagmentDto> users = userBean.getDeletedUsers(token);
+        if (users != null) {
+            return Response.status(200).entity(users).build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
         }
     }
 
@@ -117,13 +110,11 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLoggedProfile(@HeaderParam("token") String token) {
-        if (userBean.tokenExist(token)) {
-            UserDto user = userBean.getLoggedProfile(token);
-            return Response.status(200).entity(user).build();
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
         }
+        UserDto user = userBean.getLoggedProfile(token);
+        return Response.status(200).entity(user).build();
     }
 
     // Get public profile by username
@@ -132,13 +123,12 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPublicProfile(@HeaderParam("token") String token, @QueryParam("username") String username) {
-        if (userBean.tokenExist(token)) {
-            PublicProfileDto user = userBean.getPublicProfile(username);
-                return Response.status(200).entity(user).build();
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
         }
+        PublicProfileDto user = userBean.getPublicProfile(username);
+        return Response.status(200).entity(user).build();
+
     }
 
     // Get role of logged user
@@ -147,13 +137,11 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response roleByToken(@HeaderParam("token") String token) {
-        if (userBean.tokenExist(token)) {
-            RoleDto userRole = userBean.getRole(token);
-            return Response.status(200).entity(userRole).build();
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
         }
+        RoleDto userRole = userBean.getRole(token);
+        return Response.status(200).entity(userRole).build();
     }
 
     // Change token timer(Session Timeout)
@@ -161,15 +149,13 @@ public class UserService {
     @Path("/tokenTimer")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateTokenTimer(@HeaderParam("token") String token, TokenDto tokenTimer) {
-        if (userBean.tokenExist(token)) {
-            if (userBean.setTokenTimer(token, tokenTimer)) {
-                return Response.status(200).entity("Token Timer updated!").build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
+        }
+        if (userBean.setTokenTimer(token, tokenTimer)) {
+            return Response.status(200).entity("Token Timer updated!").build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
         }
     }
 
@@ -219,6 +205,21 @@ public class UserService {
         }
     }
 
+    // Validates a user
+    @PUT
+    @Path("/validate")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response validateUser(@HeaderParam("token") String token, RoleDto user) {
+        if (!userBean.tokenExist(token)) {
+            return Response.status(401).entity("Invalid token").build();
+        }
+        if (userBean.validateUser(user)) {
+            return Response.status(200).entity("User validated successfully!").build();
+        } else {
+            return Response.status(404).entity("User not found or validation failed!").build();
+        }
+    }
+
     // Makes Logout
     @PUT
     @Path("/logout")
@@ -236,27 +237,25 @@ public class UserService {
     @Path("/profile")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editProfile(@HeaderParam("token") String token, UserDto user) {
-        if (userBean.tokenExist(token)) {
-            if (user.getEmail() == null || user.getEmail().isEmpty()) {
-                return Response.status(401).entity("Email cannot be empty").build();
-            }
-            if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
-                return Response.status(401).entity("First name cannot be empty").build();
-            }
-            if (user.getLastName() == null || user.getLastName().isEmpty()) {
-                return Response.status(401).entity("Last name cannot be empty").build();
-            }
-            if (user.getPhone() == null || user.getPhone().isEmpty()) {
-                return Response.status(401).entity("Phone cannot be empty").build();
-            }
-            if (userBean.editProfile(user, token)) {
-                return Response.status(200).entity("Profile updated!").build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
+        if (!userBean.tokenExist(token)) {
+            return Response.status(401).entity("Invalid Token!").build();
+        }
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            return Response.status(401).entity("Email cannot be empty").build();
+        }
+        if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
+            return Response.status(401).entity("First name cannot be empty").build();
+        }
+        if (user.getLastName() == null || user.getLastName().isEmpty()) {
+            return Response.status(401).entity("Last name cannot be empty").build();
+        }
+        if (user.getPhone() == null || user.getPhone().isEmpty()) {
+            return Response.status(401).entity("Phone cannot be empty").build();
+        }
+        if (userBean.editProfile(user, token)) {
+            return Response.status(200).entity("Profile updated!").build();
         } else {
-            userBean.logout(token);
-            return Response.status(403).entity("Invalid Token!").build();
+            return Response.status(403).entity("Unauthorized").build();
         }
     }
 
@@ -265,27 +264,25 @@ public class UserService {
     @Path("/othersProfile")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editOthersProfile(@HeaderParam("token") String token, UserDto user) {
-        if (userBean.tokenExist(token)) {
-            if (user.getEmail() == null || user.getEmail().isEmpty()) {
-                return Response.status(401).entity("Email cannot be empty").build();
-            }
-            if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
-                return Response.status(401).entity("First name cannot be empty").build();
-            }
-            if (user.getLastName() == null || user.getLastName().isEmpty()) {
-                return Response.status(401).entity("Last name cannot be empty").build();
-            }
-            if (user.getPhone() == null || user.getPhone().isEmpty()) {
-                return Response.status(401).entity("Phone cannot be empty").build();
-            }
-            if (userBean.editUsersProfile(user, token)) {
-                return Response.status(200).entity("Profile updated!").build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
+        }
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            return Response.status(401).entity("Email cannot be empty").build();
+        }
+        if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
+            return Response.status(401).entity("First name cannot be empty").build();
+        }
+        if (user.getLastName() == null || user.getLastName().isEmpty()) {
+            return Response.status(401).entity("Last name cannot be empty").build();
+        }
+        if (user.getPhone() == null || user.getPhone().isEmpty()) {
+            return Response.status(401).entity("Phone cannot be empty").build();
+        }
+        if (userBean.editUsersProfile(user, token)) {
+            return Response.status(200).entity("Profile updated!").build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
         }
     }
 
@@ -294,21 +291,19 @@ public class UserService {
     @Path("/password")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editPassword(@HeaderParam("token") String token, PasswordDto newPassword) {
-        if (userBean.tokenExist(token)) {
-            if (newPassword.getNewPass() == null || newPassword.getNewPass().isEmpty()) {
-                return Response.status(401).entity("Password cannot be empty").build();
-            }
-            if (newPassword.getConfirmPass() == null || newPassword.getConfirmPass().isEmpty()) {
-                return Response.status(401).entity("Password cannot be empty").build();
-            }
-            if (userBean.editUserPassword(token, newPassword)) {
-                return Response.status(200).entity("Password updated!").build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
+        }
+        if (newPassword.getNewPass() == null || newPassword.getNewPass().isEmpty()) {
+            return Response.status(401).entity("Password cannot be empty").build();
+        }
+        if (newPassword.getConfirmPass() == null || newPassword.getConfirmPass().isEmpty()) {
+            return Response.status(401).entity("Password cannot be empty").build();
+        }
+        if (userBean.editUserPassword(token, newPassword)) {
+            return Response.status(200).entity("Password updated!").build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
         }
     }
 
@@ -317,21 +312,19 @@ public class UserService {
     @Path("/othersPassword")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editOthersPassword(@HeaderParam("token") String token, PasswordDto newPassword) {
-        if (userBean.tokenExist(token)) {
-            if (newPassword.getNewPass() == null || newPassword.getNewPass().isEmpty()) {
-                return Response.status(401).entity("Password cannot be empty").build();
-            }
-            if (newPassword.getConfirmPass() == null || newPassword.getConfirmPass().isEmpty()) {
-                return Response.status(401).entity("Password cannot be empty").build();
-            }
-            if (userBean.editUsersPassword(token, newPassword)) {
-                return Response.status(200).entity("Password updated!").build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
+        }
+        if (newPassword.getNewPass() == null || newPassword.getNewPass().isEmpty()) {
+            return Response.status(401).entity("Password cannot be empty").build();
+        }
+        if (newPassword.getConfirmPass() == null || newPassword.getConfirmPass().isEmpty()) {
+            return Response.status(401).entity("Password cannot be empty").build();
+        }
+        if (userBean.editUsersPassword(token, newPassword)) {
+            return Response.status(200).entity("Password updated!").build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
         }
     }
 
@@ -364,15 +357,14 @@ public class UserService {
         }
         // Proceed with registering the user
         if (!userBean.tokenExist(token)) {
-            userBean.logout(token);
             return Response.status(401).entity("Invalid Token!").build();
-        } else {
-            UserDto newUser = userBean.createUser(token, user);
-            if (newUser != null) {
-                return Response.status(200).entity(newUser).build();
-            } else return Response.status(403).entity("Unauthorized").build();
         }
+        UserDto newUser = userBean.createUser(token, user);
+        if (newUser != null) {
+            return Response.status(200).entity(newUser).build();
+        } else return Response.status(403).entity("Unauthorized").build();
     }
+
 
     // Delete user by username (Recycle bin)
     @PUT
@@ -380,16 +372,15 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUser(@HeaderParam("token") String token, @PathParam("userId") int userId) {
-        if (userBean.tokenExist(token)) {
-            if (userBean.deleteUser(token, userId)) {
-                return Response.status(200).entity("Profile deleted").build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
         }
+        if (userBean.deleteUser(token, userId)) {
+            return Response.status(200).entity("Profile deleted").build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
+        }
+
     }
 
     // Edit user role
@@ -397,15 +388,13 @@ public class UserService {
     @Path("/role")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateRole(RoleDto user, @HeaderParam("token") String token) {
-        if (userBean.tokenExist(token)) {
-            if (userBean.updateRole(user, token)) {
-                return Response.status(200).entity("Role updated").build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
+        }
+        if (userBean.updateRole(user, token)) {
+            return Response.status(200).entity("Role updated").build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
         }
     }
 
@@ -414,15 +403,13 @@ public class UserService {
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response removeUser(@HeaderParam("token") String token, @PathParam("userId") int userId) {
-        if (userBean.tokenExist(token)) {
-            if (userBean.removeUser(userId, token)) {
-                return Response.status(200).entity("Profile removed").build();
-            } else {
-                return Response.status(403).entity("Unauthorized").build();
-            }
-        } else {
-            userBean.logout(token);
+        if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
+        }
+        if (userBean.removeUser(userId, token)) {
+            return Response.status(200).entity("Profile removed").build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
         }
     }
 }

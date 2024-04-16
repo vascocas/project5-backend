@@ -3,10 +3,13 @@ package paj.project5_vc.dto;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @XmlRootElement
-public class UserTableDto {
+public class UserTableDto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     @XmlElement
     private ArrayList<UserManagmentDto> users;
     @XmlElement
@@ -68,5 +71,16 @@ public class UserTableDto {
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+    }
+
+    @Override
+    public String toString() {
+        return "UserTableDto{" +
+                "users=" + users +
+                ", totalItems=" + totalItems +
+                ", totalPages=" + totalPages +
+                ", currentPage=" + currentPage +
+                ", pageSize=" + pageSize +
+                '}';
     }
 }

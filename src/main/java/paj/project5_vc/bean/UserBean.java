@@ -1,5 +1,7 @@
 package paj.project5_vc.bean;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import paj.project5_vc.dao.ConfigurationDao;
@@ -22,6 +24,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Stateless
@@ -121,6 +125,16 @@ public class UserBean implements Serializable {
         return false;
     }
 
+    public boolean validateUser(RoleDto user) {
+        UserEntity userEntity = userDao.findUserById(user.getId());
+        if (userEntity != null) {
+            userEntity.setValidated(true);
+            userDao.persist(userEntity);
+            return true;
+        }
+        return false;
+    }
+
     public UserDto createUser(String token, UserDto user) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
@@ -145,7 +159,6 @@ public class UserBean implements Serializable {
         UserEntity u = userDao.findUserByToken(token);
         if (u != null) {
             TokenEntity t = tokenDao.findTokenByValue(token);
-            t.setTokenValue(null);
             tokenDao.remove(t);
             return true;
         }
@@ -408,20 +421,34 @@ public class UserBean implements Serializable {
         return false;
     }
 
-    public int[] getUsersCount(String token) {
+    public String getUsersCount(String token) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
-            // Check user role: DEVELOPER or SCRUM_MASTER
+            // Check user role: only PRODUCT_OWNER has access to the Dashboard
             if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
                 int totalUsers = userDao.findTotalUserCount();
                 int totalValidatedUsers = userDao.findTotalValidatedUsers();
                 int totalNonValidatedUsers = userDao.findTotalNonValidatedUserCount();
-                return new int[]{totalUsers, totalValidatedUsers, totalNonValidatedUsers};
+
+                // Create a map to hold the information
+                Map<String, Integer> userCounts = new HashMap<>();
+                userCounts.put("totalUsers", totalUsers);
+                userCounts.put("validatedUsers", totalValidatedUsers);
+                userCounts.put("nonValidatedUsers", totalNonValidatedUsers);
+
+                // Convert the map to JSON
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    return objectMapper.writeValueAsString(userCounts);
+                } catch (Exception e) {
+                    // Handle the exception
+                    e.printStackTrace();
+                }
             }
         }
-        // If user is not authenticated or authorized, return an empty int array
-        return new int[0];
+        // If user is not authenticated or authorized, return an empty JSON object
+        return "{}";
     }
 
     public double getAverageTasksPerUser(String token) {

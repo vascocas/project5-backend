@@ -3,8 +3,12 @@ package paj.project5_vc.dto;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import java.io.Serializable;
+
 @XmlRootElement
-public class PublicProfileDto {
+public class PublicProfileDto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @XmlElement
     private int userId;
@@ -121,5 +125,21 @@ public class PublicProfileDto {
 
     public void setTotalDoneTasks(int totalDoneTasks) {
         this.totalDoneTasks = totalDoneTasks;
+    }
+
+    @Override
+    public String toString() {
+        return "PublicProfileDto{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", photo='" + photo + '\'' +
+                ", totalTasks=" + totalTasks +
+                ", totalToDoTasks=" + totalToDoTasks +
+                ", totalDoingTasks=" + totalDoingTasks +
+                ", totalDoneTasks=" + totalDoneTasks +
+                '}';
     }
 }
