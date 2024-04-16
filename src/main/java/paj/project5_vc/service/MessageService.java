@@ -95,7 +95,7 @@ public class MessageService {
             return Response.status(400).entity("Message text cannot be empty").build();
         }
         if (messageBean.sendMessage(messageDto)) {
-            messageWeb.send(messageDto.getReceiverId(),"MessagesChanged");
+            messageWeb.send(token, messageDto.getReceiverId(),"MessagesChanged");
             notifWeb.send(messageDto.getReceiverId(),"NotificationUpdate");
             return Response.status(200).entity("Message sent!").build();
         } else {
@@ -112,6 +112,7 @@ public class MessageService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (messageBean.markMessageAsRead(messageId)) {
+            messageWeb.markRead("MessagesChanged");
             return Response.status(200).entity("Messages marked as read!").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();

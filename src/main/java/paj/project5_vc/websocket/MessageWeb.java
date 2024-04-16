@@ -29,7 +29,16 @@ public class MessageWeb {
     @EJB
     TokenDao tokenDao;
 
-    public void send(int receiverId, String message) {
+    public void send(String token, int receiverId, String message) {
+        Session ownSession = sessions.get(token);
+        if (ownSession != null) {
+            try {
+                // Send the message to the session
+                ownSession.getBasicRemote().sendText(message);
+            } catch (IOException e) {
+                logger.warn("Something went wrong while sending message to sender", e);
+            }
+        }
         // Retrieve the token entities associated with the receiver Id
         ArrayList<TokenEntity> receiverTokens = tokenDao.findAllTokensByUserId(receiverId);
         // Iterate over all sessions
@@ -48,6 +57,20 @@ public class MessageWeb {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    public void markRead(String message) {
+        // Iterate over all sessions
+        for (Session s : sessions.values()) {
+            if (s.isOpen()) {
+                try {
+                    // Send the message to the session
+                    s.getBasicRemote().sendText(message);
+                } catch (IOException e) {
+                    logger.warn("Something went wrong while sending message to receiver", e);
                 }
             }
         }

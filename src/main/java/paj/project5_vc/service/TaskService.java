@@ -69,6 +69,7 @@ public class TaskService {
         }
         ArrayList<TaskDto> tasks = taskBean.getUserTasks(token, userId);
         if (tasks != null) {
+            taskWeb.taskChange(token, "TasksChanged");
             return Response.status(200).entity(tasks).build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
@@ -85,6 +86,7 @@ public class TaskService {
         }
         ArrayList<TaskDto> tasks = taskBean.getCategoryTasks(token, categoryId);
         if (tasks != null) {
+            taskWeb.taskChange(token, "TasksChanged");
             return Response.status(200).entity(tasks).build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
@@ -265,6 +267,7 @@ public class TaskService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (taskBean.restoreDeletedTask(token, taskId)) {
+            taskWeb.taskChange(token, "TasksChanged");
             return Response.status(200).entity("Task restored successfully").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
