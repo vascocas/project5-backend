@@ -175,22 +175,12 @@ public class UserBean implements Serializable {
     public UserDto getLoggedProfile(String token) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
-            UserDto userDto = new UserDto();
-            userDto.setId(userEntity.getId());
-            userDto.setUsername(userEntity.getUsername());
-            userDto.setEmail(userEntity.getEmail());
-            userDto.setFirstName(userEntity.getFirstName());
-            userDto.setLastName(userEntity.getLastName());
-            userDto.setPhone(userEntity.getPhone());
-            userDto.setPhoto(userEntity.getPhoto());
-            userDto.setDeleted(userEntity.isDeleted());
-            userDto.setRole(userEntity.getRole());
+            UserDto userDto = convertUserEntitytoUserDto(userEntity);
             return userDto;
         }
         return new UserDto();
     }
 
-    // Colocar verificação para user Validado
     public UserDto getProfile(String token, int userId) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
@@ -198,17 +188,8 @@ public class UserBean implements Serializable {
             // Check if the user is a DEVELOPER or SCRUM_MASTER: can only edit own profile
             if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
                 UserEntity userEdit = userDao.findUserById(userId);
-                if (userEntity != null) {
-                    UserDto userDto = new UserDto();
-                    userDto.setId(userEdit.getId());
-                    userDto.setUsername(userEdit.getUsername());
-                    userDto.setEmail(userEdit.getEmail());
-                    userDto.setFirstName(userEdit.getFirstName());
-                    userDto.setLastName(userEdit.getLastName());
-                    userDto.setPhone(userEdit.getPhone());
-                    userDto.setPhoto(userEdit.getPhoto());
-                    userDto.setDeleted(userEdit.isDeleted());
-                    userDto.setRole(userEdit.getRole());
+                if (userEdit != null && userEdit.isValidated()) {
+                    UserDto userDto = convertUserEntitytoUserDto(userEdit);
                     return userDto;
                 }
             }
@@ -360,7 +341,7 @@ public class UserBean implements Serializable {
                 } else {
                     userList = userDao.findAllActiveUsers(order, offset, pageSize);
                     // Get the total count of users
-                    totalItems = userDao.findTotalUserCountbyActive();
+                    totalItems = userDao.findTotalValidatedUsers();
                 }
                 if (userList != null) {
                     // Get the total number of pages based on the total items and page size
@@ -427,13 +408,29 @@ public class UserBean implements Serializable {
         return false;
     }
 
+    public int[] getUsersCount(String token) {
+        UserEntity userEntity = userDao.findUserByToken(token);
+        if (userEntity != null) {
+            UserRole userRole = userEntity.getRole();
+            // Check user role: DEVELOPER or SCRUM_MASTER
+            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
+                int totalUsers = userDao.findTotalUserCount();
+                int totalValidatedUsers = userDao.findTotalValidatedUsers();
+                int totalNonValidatedUsers = userDao.findTotalNonValidatedUserCount();
+                return new int[]{totalUsers, totalValidatedUsers, totalNonValidatedUsers};
+            }
+        }
+        // If user is not authenticated or authorized, return an empty int array
+        return new int[0];
+    }
+
     public double getAverageTasksPerUser(String token) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
             // Check user role: DEVELOPER or SCRUM_MASTER
             if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
-                int totalUsers = userDao.findTotalUserCountbyActive();
+                int totalUsers = userDao.findTotalValidatedUsers();
                 int totalTasks = taskDao.countTotalTasks();
                 if (totalUsers > 0) {
                     return (double) totalTasks / totalUsers;
@@ -474,6 +471,7 @@ public class UserBean implements Serializable {
         userDto.setPhone(user.getPhone());
         userDto.setPhoto(user.getPhoto());
         userDto.setDeleted(user.isDeleted());
+        userDto.setValidated(user.isValidated());
         userDto.setRole(user.getRole());
         return userDto;
     }

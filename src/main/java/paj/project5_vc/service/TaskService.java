@@ -9,10 +9,10 @@ import paj.project5_vc.entity.CategoryEntity;
 import paj.project5_vc.enums.TaskPriority;
 import paj.project5_vc.enums.TaskState;
 import jakarta.ejb.EJB;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import paj.project5_vc.websocket.TaskWeb;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -23,11 +23,13 @@ public class TaskService {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject
+    @EJB
     UserBean userBean;
-    @Inject
+    @EJB
+    TaskWeb taskWeb;
+    @EJB
     TaskBean taskBean;
-    @Inject
+    @EJB
     CategoryBean ctgBean;
     @EJB
     CategoryDao categoryDao;
@@ -227,6 +229,7 @@ public class TaskService {
             return Response.status(400).entity("Invalid state").build();
         }
         if (taskBean.updateTaskStatus(newStatus)) {
+            taskWeb.moveTask(newStatus);
             return Response.status(200).entity("Task status updated successfully").build();
         } else {
             return Response.status(404).entity("Task not found").build();
@@ -242,6 +245,7 @@ public class TaskService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (taskBean.removeTask(token, taskId)) {
+            taskWeb.deleteTask(taskId);
             return Response.status(200).entity("Task delete successfully").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();

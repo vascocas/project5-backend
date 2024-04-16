@@ -31,11 +31,13 @@ public class UserDto {
     private UserRole role;
     @XmlElement
     private boolean deleted;
+    @XmlElement
+    private boolean validated;
 
     public UserDto() {
     }
 
-    public UserDto(String username, String password, String email, String firstName, String lastName, String phone, String photo, UserRole role, boolean deleted) {
+    public UserDto(String username, String password, String email, String firstName, String lastName, String phone, String photo, UserRole role, boolean deleted, boolean validated) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -45,6 +47,7 @@ public class UserDto {
         this.photo = photo;
         this.role = role;
         this.deleted = deleted;
+        this.validated = validated;
     }
 
     public int getId() {
@@ -135,4 +138,11 @@ public class UserDto {
         this.deleted = deleted;
     }
 
+    public boolean isValidated() {
+        return validated;
+    }
+
+    public void setValidated(boolean validated) {
+        this.validated = validated;
+    }
 }

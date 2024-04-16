@@ -1,5 +1,6 @@
 package paj.project5_vc.service;
 
+import jakarta.ejb.EJB;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -16,10 +17,10 @@ public class NotificationService {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject
+    @EJB
     UserBean userBean;
 
-    @Inject
+    @EJB
     NotificationBean notificationBean;
 
     // Endpoint to get user notifications

@@ -9,6 +9,8 @@ import paj.project5_vc.enums.TaskState;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 @Stateless
@@ -112,6 +114,26 @@ public class TaskDao extends AbstractDao<TaskEntity> {
             return null;
         }
     }
+
+    public int countTasksByCategory(int categoryId) {
+        try {
+            return (int) em.createNamedQuery("Task.countTasksByCategory")
+                    .setParameter("categoryId", categoryId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return 0;
+        }
+    }
+
+    public List<Object[]> countTasksByCategoryOrderedByCount() {
+        try {
+            return em.createNamedQuery("Task.countTasksByCategoryOrderedByCount").getResultList();
+        } catch (Exception e) {
+            e.printStackTrace(); // Handle or log the exception as needed
+            return Collections.emptyList();
+        }
+    }
+
 
 
     public ArrayList<TaskEntity> countTasksByStatus() {

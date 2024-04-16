@@ -1,5 +1,6 @@
 package paj.project5_vc.service;
 
+import jakarta.ejb.EJB;
 import paj.project5_vc.bean.UserBean;
 import paj.project5_vc.dto.*;
 import jakarta.inject.Inject;
@@ -15,7 +16,7 @@ public class UserService {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject
+    @EJB
     UserBean userBean;
 
     // Get token timer(Session Timeout)

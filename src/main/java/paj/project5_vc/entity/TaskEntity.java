@@ -15,6 +15,9 @@ import java.time.LocalDate;
 @NamedQuery(name = "Task.findTasksByUser", query = "SELECT t FROM TaskEntity t WHERE t.creator = :creator AND t.deleted = :deleted")
 @NamedQuery(name = "Task.findTasksByCategoryId", query = "SELECT t FROM TaskEntity t WHERE t.category.id = :categoryId")
 @NamedQuery(name = "Task.findTasksByDeleted", query = "SELECT t FROM TaskEntity t WHERE t.deleted = :deleted ORDER BY t.id")
+@NamedQuery(name = "Task.countTasksByCategory", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.category.id = :categoryId AND t.deleted = false")
+@NamedQuery(name = "Task.countTasksByCategoryOrderedByCount", query = "SELECT t.category.id, COUNT(t) AS taskCount FROM TaskEntity t WHERE t.deleted = false GROUP BY t.category.id ORDER BY taskCount DESC")
+
 @NamedQuery(name = "Task.findTotalTasksByUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.deleted = false")
 @NamedQuery(name = "Task.findTotalTasksByStateAndUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.state = :state AND t.deleted = false")
 @NamedQuery(name = "Task.countTasksByStatus", query = "SELECT t.state, COUNT(t) AS taskCount FROM TaskEntity t WHERE t.deleted = false GROUP BY t.state")

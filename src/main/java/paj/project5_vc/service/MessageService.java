@@ -19,7 +19,7 @@ public class MessageService {
 
     @EJB
     MessageBean messageBean;
-    @Inject
+    @EJB
     UserBean userBean;
 
     // Endpoint to get all user messages

@@ -23,7 +23,7 @@ import paj.project5_vc.websocket.TaskWeb;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.*;
 
 
 @Stateless
@@ -38,7 +38,7 @@ public class TaskBean implements Serializable {
     UserDao userDao;
     @EJB
     CategoryDao categoryDao;
-    @Inject
+    @EJB
     TaskWeb taskWeb;
 
     public TaskBean() {
@@ -79,19 +79,6 @@ public class TaskBean implements Serializable {
                 TaskEntity t = taskDao.findTaskById(id);
                 if (t != null) {
                     t.setDeleted(true);
-                    // Prepare return Task Dto
-                    TaskDto returnDto = new TaskDto();
-                    returnDto.setId(t.getId());
-                    returnDto.setTitle(t.getTitle());
-                    returnDto.setDescription(t.getDescription());
-                    returnDto.setStartDate(t.getStartDate());
-                    returnDto.setEndDate(t.getEndDate());
-                    returnDto.setPriority(t.getPriority());
-                    returnDto.setDeleted(t.isDeleted());
-                    returnDto.setCreator(t.getCreator().getUsername());
-                    returnDto.setState(t.getState());
-                    returnDto.setCategory(t.getCategory().getCategoryName());
-                    taskWeb.deleteTask(returnDto);
                     return true;
                 }
             }
@@ -263,44 +250,66 @@ public class TaskBean implements Serializable {
                 t.setCompletedDate(LocalDate.now()); // Set the completion date
             }
             t.setState(newState); // Update the task state
-
-            // Prepare return Task State Dto
-            TaskStateDto returnDto = new TaskStateDto();
-            returnDto.setId(newStatus.getId());
-            returnDto.setState(newStatus.getState());
-            taskWeb.moveTask(returnDto);
             return true;
         }
         return false;
     }
 
-    public ArrayList<TaskDto> getCategoryTasksWithCumulativeSum(String token, int categoryId) {
+    public HashMap<Integer, Integer> getCategoryTasksSum(String token) {
+        HashMap<Integer, Integer> categoryTasksMap = new HashMap<>();
+
         // Get user role by token
         UserEntity user = userDao.findUserByToken(token);
         if (user != null) {
             UserRole userRole = user.getRole();
-            // Check if the user is a SCRUM_MASTER or PRODUCT_OWNER
-            if (userRole == UserRole.SCRUM_MASTER || userRole == UserRole.PRODUCT_OWNER) {
-                CategoryEntity ctgEntity = categoryDao.findCategoryById(categoryId);
-                if (ctgEntity != null) {
-                    ArrayList<TaskEntity> tasks = taskDao.findTasksByCategoryId(ctgEntity.getId());
-                    if (tasks != null) {
-                        // Calculate cumulative sum
-                        int cumulativeSum = 0;
-                        ArrayList<TaskDto> taskDtos = new ArrayList<>();
-                        for (TaskEntity task : tasks) {
-                            // Convert TaskEntity to TaskDto and add to the list
-                            TaskDto taskDto = convertTaskFromEntityToDto(task);
-                            cumulativeSum++;
-                            //taskDto.setCumulativeSum(cumulativeSum);
-                            taskDtos.add(taskDto);
-                        }
-                        return taskDtos;
+            // Check if the user is a PRODUCT_OWNER
+            if (userRole == UserRole.PRODUCT_OWNER) {
+                ArrayList<CategoryEntity> categories = categoryDao.findAllCategories();
+                for (CategoryEntity ctgEntity : categories) {
+                    if (ctgEntity != null) {
+                        // Fetch the number of tasks for the current category
+                        int taskCount = taskDao.countTasksByCategory(ctgEntity.getId());
+                        // Map category ID to task count
+                        categoryTasksMap.put(ctgEntity.getId(), taskCount);
                     }
                 }
+
+                // Sort the HashMap by task count in descending order
+                categoryTasksMap = sortByValueDescending(categoryTasksMap);
             }
         }
-        return null;
+        return categoryTasksMap;
+    }
+
+    // Method to sort the HashMap by value in descending order
+    public static HashMap<Integer, Integer> sortByValueDescending(HashMap<Integer, Integer> map) {
+        List<Map.Entry<Integer, Integer>> list = new LinkedList<>(map.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<Integer, Integer>>() {
+            public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+                return (o2.getValue()).compareTo(o1.getValue());
+            }
+        });
+
+        HashMap<Integer, Integer> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Integer> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
+    }
+
+
+    public List<Object[]> getCategoryTasksBySum(String token) {
+        // Get user role by token
+        UserEntity user = userDao.findUserByToken(token);
+        if (user != null) {
+            UserRole userRole = user.getRole();
+            // Check if the user is a PRODUCT_OWNER
+            if (userRole == UserRole.PRODUCT_OWNER) {
+                return taskDao.countTasksByCategoryOrderedByCount();
+            }
+        }
+        return Collections.emptyList(); // Return an empty list if user is not authenticated or authorized
     }
 
     private TaskDto convertTaskFromEntityToDto(TaskEntity t) {

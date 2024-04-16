@@ -83,10 +83,34 @@ public class UserDao extends AbstractDao<UserEntity> {
         }
     }
 
-    // Method to count total active users
-    public int findTotalUserCountbyActive() {
+    // Method to count total users
+    public int findTotalUserCount() {
         try {
-            Long count = (Long) em.createNamedQuery("User.findTotalActiveUserCount")
+            Long count = (Long) em.createNamedQuery("User.findTotalUserCount")
+                    .getSingleResult();
+            return count.intValue();
+        } catch (Exception e) {
+            // Handle any exceptions
+            return -1; // Or return any appropriate default value
+        }
+    }
+
+    // Method to count total validated users
+    public int findTotalValidatedUsers() {
+        try {
+            Long count = (Long) em.createNamedQuery("User.findTotalValidatedUserCount")
+                    .getSingleResult();
+            return count.intValue();
+        } catch (Exception e) {
+            // Handle any exceptions
+            return -1; // Or return any appropriate default value
+        }
+    }
+
+    // Method to count total non-validated users
+    public int findTotalNonValidatedUserCount() {
+        try {
+            Long count = (Long) em.createNamedQuery("User.findTotalNonValidatedUserCount")
                     .getSingleResult();
             return count.intValue();
         } catch (Exception e) {

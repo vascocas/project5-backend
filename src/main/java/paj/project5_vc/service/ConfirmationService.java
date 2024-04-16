@@ -1,5 +1,6 @@
 package paj.project5_vc.service;
 
+import jakarta.ejb.EJB;
 import jakarta.inject.Inject;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
@@ -15,7 +16,7 @@ import jakarta.ws.rs.core.Response;
 
         private static final long serialVersionUID = 1L;
 
-        @Inject
+        @EJB
         UserBean userBean;
 
         @POST
