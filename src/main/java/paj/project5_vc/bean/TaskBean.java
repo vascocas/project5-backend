@@ -306,7 +306,7 @@ public class TaskBean implements Serializable {
         return category.getCategoryName();
     }
 
-    public List<DayCount> getCompletedTasksCumulativeCountForLastWeek() {
+    public List<DayCount> getCompletedTasksCumulative() {
         List<DayCount> counts = new ArrayList<>();
         LocalDate today = LocalDate.now();
         int cumulativeCount = 0;

@@ -30,12 +30,12 @@ public class DashboardService {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        String userCountsJson = userBean.getUsersCount(token);
-        if (userCountsJson.isEmpty()) {
+        String userCounts = userBean.getUsersCount(token);
+        if (userCounts.isEmpty()) {
             // Handle the case where the user is not authenticated or authorized
             return Response.status(403).entity("User not authorized").build();
         }
-        return Response.status(200).entity(userCountsJson).build();
+        return Response.status(200).entity(userCounts).build();
     }
 
     //Count of tasks per state
@@ -118,7 +118,7 @@ public class DashboardService {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        List<DayCount> result = taskBean.getCompletedTasksCumulativeCountForLastWeek();
+        List<DayCount> result = taskBean.getCompletedTasksCumulative();
         if (result.isEmpty()) {
             // Handle the case where the user is not authorized or no data is available
             return Response.status(403).entity("User not authorized or no data available").build();
