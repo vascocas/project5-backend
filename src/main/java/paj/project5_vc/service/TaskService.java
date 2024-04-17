@@ -233,7 +233,6 @@ public class TaskService {
             return Response.status(400).entity("Invalid state").build();
         }
         if (taskBean.updateTaskStatus(newStatus)) {
-            System.out.println("Move task");
             taskWeb.taskChange(token, "TasksChanged");
             return Response.status(200).entity("Task status updated successfully").build();
         } else {

@@ -1,7 +1,6 @@
 package paj.project5_vc.bean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import paj.project5_vc.dao.ConfigurationDao;
@@ -21,11 +20,9 @@ import jakarta.ejb.Stateless;
 import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 @Stateless
@@ -68,6 +65,9 @@ public class UserBean implements Serializable {
         }
         return false;
     }
+
+    //TODO
+    // incluir validação para user validated!!!!
 
     public LoginDto login(String username, String password) {
         LoginDto successLogin = new LoginDto();
@@ -124,6 +124,9 @@ public class UserBean implements Serializable {
         }
         return false;
     }
+
+    //TODO
+    // incluir validação para user role!!!!
 
     public boolean validateUser(RoleDto user) {
         UserEntity userEntity = userDao.findUserById(user.getId());
@@ -455,8 +458,8 @@ public class UserBean implements Serializable {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
-            // Check user role: DEVELOPER or SCRUM_MASTER
-            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
+            // Check user role: PRODUCT_OWNER
+            if (userRole == UserRole.PRODUCT_OWNER) {
                 int totalUsers = userDao.findTotalValidatedUsers();
                 int totalTasks = taskDao.countTotalTasks();
                 if (totalUsers > 0) {
@@ -465,6 +468,17 @@ public class UserBean implements Serializable {
             }
         }
         return 0;
+    }
+
+    public List<DayCount> getRegisteredUsersCountForLastWeek() {
+        List<DayCount> counts = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        for (int i = 6; i >= 0; i--) {
+            LocalDate currentDate = today.minusDays(i);
+            int userCount = userDao.findTotalUsersCountByDayRegisterAt(currentDate);
+            counts.add(new DayCount(currentDate, userCount));
+        }
+        return counts;
     }
 
     private UserEntity convertUserDtotoEntity(UserDto user) {

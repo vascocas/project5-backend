@@ -18,9 +18,6 @@ public class TaskDao extends AbstractDao<TaskEntity> {
 
     private static final long serialVersionUID = 1L;
 
-    @EJB
-    private CategoryDao categoryDao;
-
     public TaskDao() {
         super(TaskEntity.class);
     }
@@ -115,16 +112,6 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         }
     }
 
-    public int countTasksByCategory(int categoryId) {
-        try {
-            return (int) em.createNamedQuery("Task.countTasksByCategory")
-                    .setParameter("categoryId", categoryId)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return 0;
-        }
-    }
-
     public List<Object[]> countTasksByCategoryOrderedByCount() {
         try {
             return em.createNamedQuery("Task.countTasksByCategoryOrderedByCount").getResultList();
@@ -134,26 +121,13 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         }
     }
 
-
-
-    public ArrayList<TaskEntity> countTasksByStatus() {
+    public List<Object[]> countTasksByStatus() {
         try {
-            return (ArrayList<TaskEntity>) em.createNamedQuery("Task.countTasksByStatus")
+            return em.createNamedQuery("Task.countTasksByStatus")
                     .getResultList();
         } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public int getTasksCompletedOverTime(TaskState taskState) {
-        try {
-            // Query to retrieve cumulative count of completed tasks over time for a specific state, grouped by day
-            Long compTasks = (Long) em.createNamedQuery("Task.countTasksByDayAndState")
-                    .setParameter("state", taskState.getValue())
-                    .getSingleResult();
-            return compTasks.intValue();
-        } catch (NoResultException e) {
-            return 0;
+            e.printStackTrace(); // Handle or log the exception as needed
+            return Collections.emptyList();
         }
     }
 
@@ -168,5 +142,15 @@ public class TaskDao extends AbstractDao<TaskEntity> {
         }
     }
 
+    public double findAverageTaskDuration() {
+        try {
+            // Query to retrieve the average value of the task duration
+            Double averageDuration = (Double) em.createNamedQuery("Task.findAverageTaskDuration")
+                    .getSingleResult();
+            return averageDuration != null ? averageDuration : 0.0; // Return 0.0 if no tasks exist or duration is null
+        } catch (NoResultException e) {
+            return 0.0; // Return 0.0 if no tasks exist
+        }
+    }
 
 }

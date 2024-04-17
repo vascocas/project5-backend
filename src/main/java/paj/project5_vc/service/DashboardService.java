@@ -1,16 +1,14 @@
 package paj.project5_vc.service;
 
 import jakarta.ejb.EJB;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import paj.project5_vc.bean.TaskBean;
 import paj.project5_vc.bean.UserBean;
-import paj.project5_vc.dto.CategoryTasksSummary;
-import paj.project5_vc.dto.TaskDto;
+import paj.project5_vc.dto.DayCount;
+import paj.project5_vc.dto.TasksSummary;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("/dashboard")
@@ -26,7 +24,7 @@ public class DashboardService {
 
     // Count of total number of users, validated users, and unvalidated users
     @GET
-    @Path("usersCount")
+    @Path("users/count")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsersCount(@HeaderParam("token") String token) {
         if (!userBean.tokenExist(token)) {
@@ -40,29 +38,31 @@ public class DashboardService {
         return Response.status(200).entity(userCountsJson).build();
     }
 
-
-    //Count of tasks per state: This could also be retrieved in a single request since it's related to task data.
-
-    // EM CONSTRUÇÃO
+    //Count of tasks per state
     @GET
-    @Path("")
+    @Path("tasks/state")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTasksStateCount(@HeaderParam("token") String token) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        return Response.status(200).entity(userBean.getUsersCount(token)).build();
+        List<TasksSummary> stateTasks = taskBean.countTasksByStatus(token);
+        if (stateTasks.isEmpty()) {
+            // Handle the case where the user is not authorized
+            return Response.status(403).entity("User not authorized").build();
+        }
+        return Response.status(200).entity(stateTasks).build();
     }
 
     //List of categories ordered by frequency
     @GET
-    @Path("categoriesSum")
+    @Path("categories/frequency")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategoriesFrequency(@HeaderParam("token") String token) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        List<CategoryTasksSummary> categoryTasks = taskBean.getCategoryTasksBySum(token);
+        List<TasksSummary> categoryTasks = taskBean.getCategoryTasksBySum(token);
         if (categoryTasks.isEmpty()) {
             // Handle the case where the user is not authorized
             return Response.status(403).entity("User not authorized").build();
@@ -70,13 +70,9 @@ public class DashboardService {
         return Response.status(200).entity(categoryTasks).build();
     }
 
-
-
-    //Average number of tasks per user: This could be part of the user-related data request.
-
-    // Endpoint to get Average Tasks Per User
+    //Average number of tasks per user
     @GET
-    @Path("")
+    @Path("average/tasks/user")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAverageTasksPerUser(@HeaderParam("token") String token) {
         if (!userBean.tokenExist(token)) {
@@ -86,9 +82,48 @@ public class DashboardService {
         return Response.status(200).entity(averageTasksPerUser).build();
     }
 
-    //
-    //Graph showing the number of registered users over time: This data might need to be retrieved separately since it involves a time series.
-    //
-    //Cumulative graph showing the total number of tasks completed over time: Similar to the previous point, this might need to be fetched separately due to its time-based nature.ila
+    // Endpoint to get the average task duration
+    @GET
+    @Path("tasks/average/duration")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAverageTaskDuration(@HeaderParam("token") String token) {
+        if (!userBean.tokenExist(token)) {
+            return Response.status(401).entity("Invalid token").build();
+        }
+        double averageTaskDuration = taskBean.getAverageTaskDuration();
+        return Response.status(200).entity(averageTaskDuration).build();
+    }
+
+    // Get the count of validated users for the last week
+    @GET
+    @Path("users/weekly/count")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRegisteredUsersCountWeekly(@HeaderParam("token") String token) {
+        if (!userBean.tokenExist(token)) {
+            return Response.status(401).entity("Invalid token").build();
+        }
+        List<DayCount> validatedUsersCountForLastWeek = userBean.getRegisteredUsersCountForLastWeek();
+        if (validatedUsersCountForLastWeek.isEmpty()) {
+            // Handle the case where the user is not authorized or no data is available
+            return Response.status(403).entity("User not authorized or no data available").build();
+        }
+        return Response.status(200).entity(validatedUsersCountForLastWeek).build();
+    }
+
+    // Get the cumulative count of completed tasks for the last week
+    @GET
+    @Path("tasks/completed/count")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCompletedTasksCountWeekly(@HeaderParam("token") String token) {
+        if (!userBean.tokenExist(token)) {
+            return Response.status(401).entity("Invalid token").build();
+        }
+        List<DayCount> result = taskBean.getCompletedTasksCumulativeCountForLastWeek();
+        if (result.isEmpty()) {
+            // Handle the case where the user is not authorized or no data is available
+            return Response.status(403).entity("User not authorized or no data available").build();
+        }
+        return Response.status(200).entity(result).build();
+    }
 
 }

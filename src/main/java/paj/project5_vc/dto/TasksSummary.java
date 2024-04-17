@@ -6,44 +6,42 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 @XmlRootElement
-public class CategoryTasksSummary implements Serializable {
+public class TasksSummary implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @XmlElement
-    private String category;
+    private String field;
     @XmlElement
-    private int taskCountSum;
+    private int sum;
 
-    public CategoryTasksSummary() {
+    public TasksSummary() {
     }
 
-    public CategoryTasksSummary(String category, int taskCountSum) {
-        this.category = category;
-        this.taskCountSum = taskCountSum;
+    public TasksSummary(String category, int sum) {
+        this.field = category;
+        this.sum = sum;
     }
 
     // Getters and setters
-    public String getCategory() {
-        return category;
+    public String getField() {
+        return field;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setField(String field) {
+        this.field = field;
     }
 
-    public int getTaskCountSum() {
-        return taskCountSum;
+    public int getSum() {
+        return sum;
     }
 
-    public void setTaskCountSum(int taskCountSum) {
-        this.taskCountSum = taskCountSum;
+    public void setSum(int sum) {
+        this.sum = sum;
     }
 
     @Override
     public String toString() {
-        return "CategoryTasksSummary{" +
-                "category='" + category + '\'' +
-                ", taskCountSum=" + taskCountSum +
-                '}';
+        return "category='" + field + '\'' +
+                ", sum=" + sum;
     }
 }

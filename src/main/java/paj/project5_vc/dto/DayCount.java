@@ -8,17 +8,17 @@ import java.time.LocalDate;
 
 
 @XmlRootElement
-public class DayUserCount implements Serializable {
+public class DayCount implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @XmlElement
     private LocalDate date;
     @XmlElement
-    private int userCount;
+    private int value;
 
-    public DayUserCount(LocalDate date, int userCount) {
+    public DayCount(LocalDate date, int value) {
         this.date = date;
-        this.userCount = userCount;
+        this.value = value;
     }
 
     // Getters and setters
@@ -30,19 +30,19 @@ public class DayUserCount implements Serializable {
         this.date = date;
     }
 
-    public int getUserCount() {
-        return userCount;
+    public int getValue() {
+        return value;
     }
 
-    public void setUserCount(int userCount) {
-        this.userCount = userCount;
+    public void setValue(int value) {
+        this.value = value;
     }
 
     @Override
     public String toString() {
-        return "DayUserCount{" +
+        return "DayCount{" +
                 "date=" + date +
-                ", userCount=" + userCount +
+                ", value=" + value +
                 '}';
     }
 }

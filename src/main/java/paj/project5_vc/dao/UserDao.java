@@ -182,14 +182,14 @@ public class UserDao extends AbstractDao<UserEntity> {
         }
     }
 
-    public int findTotalUsersCountByDayValidatedAt(LocalDate validatedAt) {
+    public int findTotalUsersCountByDayRegisterAt(LocalDate registerAtParam) {
         try {
             return em.createNamedQuery("User.findTotalUsersCountByValidatedAt", Long.class)
-                    .setParameter("validatedAtParam", validatedAt)
+                    .setParameter("registerAtParam", registerAtParam)
                     .getSingleResult()
                     .intValue();
         } catch (NoResultException e) {
-            return 0; // Return 0 if no users found for the validatedAt timestamp
+            return 0; // Return 0 if no users found for the registerAt timestamp
         }
     }
 

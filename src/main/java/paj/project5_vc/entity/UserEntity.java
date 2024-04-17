@@ -26,7 +26,7 @@ import paj.project5_vc.enums.UserRole;
 @NamedQuery(name = "User.findTotalPagesActiveUserCount", query = "SELECT FUNCTION('CEIL', COUNT(u) / :pageSize) FROM UserEntity u WHERE u.deleted = false")
 @NamedQuery(name = "User.findTotalUsersCountByRole", query = "SELECT COUNT(u) FROM UserEntity u WHERE u.deleted = false AND u.role = :role")
 @NamedQuery(name = "User.findTotalPagesCountByRole", query = "SELECT FUNCTION('CEIL', COUNT(u) / :pageSize) FROM UserEntity u WHERE u.deleted = false AND u.role = :role")
-@NamedQuery(name = "User.findTotalUsersCountByValidatedAt", query = "SELECT COUNT(u) FROM UserEntity u WHERE u.deleted = false AND DAY(u.validatedAt) = DAY(:validatedAtParam)")
+@NamedQuery(name = "User.findTotalUsersCountByValidatedAt", query = "SELECT COUNT(u) FROM UserEntity u WHERE u.deleted = false AND DAY(u.registerAt) = DAY(:registerAtParam)")
 
 
 
@@ -67,8 +67,8 @@ public class UserEntity implements Serializable {
     private boolean validated;
 
     @CreationTimestamp
-    @Column(name = "validated_at", nullable = false)
-    private Timestamp validatedAt;
+    @Column(name = "register_at", nullable = false)
+    private Timestamp registerAt;
 
     @Column(name = "role", nullable = false)
     private int role;
@@ -173,12 +173,12 @@ public class UserEntity implements Serializable {
         this.validated = validated;
     }
 
-    public Timestamp getValidatedAt() {
-        return validatedAt;
+    public Timestamp getRegisterAt() {
+        return registerAt;
     }
 
-    public void setValidatedAt(Timestamp validatedAt) {
-        this.validatedAt = validatedAt;
+    public void setRegisterAt(Timestamp registerAt) {
+        this.registerAt = registerAt;
     }
 
     public Set<TokenEntity> getTokens() {

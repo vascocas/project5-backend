@@ -17,13 +17,12 @@ import java.time.LocalDate;
 @NamedQuery(name = "Task.findTasksByDeleted", query = "SELECT t FROM TaskEntity t WHERE t.deleted = :deleted ORDER BY t.id")
 @NamedQuery(name = "Task.countTasksByCategory", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.category.id = :categoryId AND t.deleted = false")
 @NamedQuery(name = "Task.countTasksByCategoryOrderedByCount", query = "SELECT t.category.id, COUNT(t) AS taskCount FROM TaskEntity t WHERE t.deleted = false GROUP BY t.category.id ORDER BY taskCount DESC")
-
 @NamedQuery(name = "Task.findTotalTasksByUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.deleted = false")
 @NamedQuery(name = "Task.findTotalTasksByStateAndUser", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.creator.username = :username AND t.state = :state AND t.deleted = false")
 @NamedQuery(name = "Task.countTasksByStatus", query = "SELECT t.state, COUNT(t) AS taskCount FROM TaskEntity t WHERE t.deleted = false GROUP BY t.state")
 @NamedQuery(name = "Task.countTotalTasks", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.deleted = false")
-@NamedQuery(name = "Task.countTasksByDayAndState", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.state = :state AND t.deleted = false GROUP BY FUNCTION('DATE', t.completedDate)")
 @NamedQuery(name = "Task.countCompletedTasksByDate", query = "SELECT COUNT(t) FROM TaskEntity t WHERE t.deleted = false AND t.completedDate = :dateParam")
+@NamedQuery(name = "Task.findAverageTaskDuration", query = "SELECT AVG(t.duration) FROM TaskEntity t WHERE t.duration IS NOT NULL")
 
 
 public class TaskEntity implements Serializable {
@@ -47,8 +46,11 @@ public class TaskEntity implements Serializable {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "duration")
+    @Column(name = "completed_date")
     private LocalDate completedDate;
+
+    @Column(name = "duration")
+    private int duration;
 
     @Column(name = "state", nullable = false)
     private int state;
@@ -116,6 +118,14 @@ public class TaskEntity implements Serializable {
 
     public void setCompletedDate(LocalDate completedDate) {
         this.completedDate = completedDate;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     public TaskState getState() {

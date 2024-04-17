@@ -1,29 +1,25 @@
 package paj.project5_vc.bean;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.inject.Inject;
-import jakarta.xml.bind.annotation.XmlElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import paj.project5_vc.dao.CategoryDao;
 import paj.project5_vc.dao.TaskDao;
 import paj.project5_vc.dao.UserDao;
-import paj.project5_vc.dto.CategoryTasksSummary;
+import paj.project5_vc.dto.DayCount;
+import paj.project5_vc.dto.TasksSummary;
 import paj.project5_vc.dto.TaskDto;
 import paj.project5_vc.dto.TaskStateDto;
 import paj.project5_vc.entity.CategoryEntity;
 import paj.project5_vc.entity.TaskEntity;
 import paj.project5_vc.entity.UserEntity;
-import paj.project5_vc.enums.TaskPriority;
 import paj.project5_vc.enums.TaskState;
 import paj.project5_vc.enums.UserRole;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import paj.project5_vc.websocket.TaskWeb;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -39,8 +35,6 @@ public class TaskBean implements Serializable {
     UserDao userDao;
     @EJB
     CategoryDao categoryDao;
-    @EJB
-    TaskWeb taskWeb;
 
     public TaskBean() {
     }
@@ -246,61 +240,45 @@ public class TaskBean implements Serializable {
         if (t != null) {
             TaskState currentState = t.getState();
             TaskState newState = newStatus.getState();
-            // Check if the task is transitioning to the DONE state
-            if (currentState == TaskState.DOING && newState == TaskState.DONE) {
-                t.setCompletedDate(LocalDate.now()); // Set the completion date
+            // Add validation to prevent unnecessary updates
+            if (currentState != newState) {
+                // Check if the task is transitioning to the DONE state (set completion date)
+                if (currentState == TaskState.DOING && newState == TaskState.DONE) {
+                    t.setCompletedDate(LocalDate.now());
+                    // Calculate and set duration in days
+                    long duration = ChronoUnit.DAYS.between(t.getStartDate(), t.getCompletedDate());
+                    t.setDuration((int) duration);
+                }
+                t.setState(newState); // Update the task state
+                return true;
             }
-            t.setState(newState); // Update the task state
-            return true;
         }
         return false;
     }
 
-    public HashMap<Integer, Integer> getCategoryTasksSum(String token) {
-        HashMap<Integer, Integer> categoryTasksMap = new HashMap<>();
-
+    public List<TasksSummary> countTasksByStatus(String token) {
         // Get user role by token
         UserEntity user = userDao.findUserByToken(token);
         if (user != null) {
             UserRole userRole = user.getRole();
             // Check if the user is a PRODUCT_OWNER
             if (userRole == UserRole.PRODUCT_OWNER) {
-                ArrayList<CategoryEntity> categories = categoryDao.findAllCategories();
-                for (CategoryEntity ctgEntity : categories) {
-                    if (ctgEntity != null) {
-                        // Fetch the number of tasks for the current category
-                        int taskCount = taskDao.countTasksByCategory(ctgEntity.getId());
-                        // Map category ID to task count
-                        categoryTasksMap.put(ctgEntity.getId(), taskCount);
-                    }
+                List<Object[]> taskStateCounts = taskDao.countTasksByStatus();
+                List<TasksSummary> taskStateSummaries = new ArrayList<>();
+                for (Object[] taskStateCount : taskStateCounts) {
+                    Integer stateValue = (Integer) taskStateCount[0];
+                    String state = TaskState.fromValue(stateValue).name();
+                    int count = ((Number) taskStateCount[1]).intValue();
+                    TasksSummary summary = new TasksSummary(state, count);
+                    taskStateSummaries.add(summary);
                 }
-
-                // Sort the HashMap by task count in descending order
-                categoryTasksMap = sortByValueDescending(categoryTasksMap);
+                return taskStateSummaries;
             }
         }
-        return categoryTasksMap;
+        return Collections.emptyList(); // Return an empty list if user is not authenticated or authorized
     }
 
-    // Method to sort the HashMap by value in descending order
-    public static HashMap<Integer, Integer> sortByValueDescending(HashMap<Integer, Integer> map) {
-        List<Map.Entry<Integer, Integer>> list = new LinkedList<>(map.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<Integer, Integer>>() {
-            public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
-                return (o2.getValue()).compareTo(o1.getValue());
-            }
-        });
-
-        HashMap<Integer, Integer> sortedMap = new LinkedHashMap<>();
-        for (Map.Entry<Integer, Integer> entry : list) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-
-        return sortedMap;
-    }
-
-
-    public List<CategoryTasksSummary> getCategoryTasksBySum(String token) {
+    public List<TasksSummary> getCategoryTasksBySum(String token) {
         // Get user role by token
         UserEntity user = userDao.findUserByToken(token);
         if (user != null) {
@@ -308,17 +286,41 @@ public class TaskBean implements Serializable {
             // Check if the user is a PRODUCT_OWNER
             if (userRole == UserRole.PRODUCT_OWNER) {
                 List<Object[]> categoryTasks = taskDao.countTasksByCategoryOrderedByCount();
-                List<CategoryTasksSummary> categoryTaskSummaries = new ArrayList<>();
+                List<TasksSummary> categoryTaskSummaries = new ArrayList<>();
                 for (Object[] categoryTask : categoryTasks) {
-                    String category = (String) categoryTask[0];
+                    Integer categoryId = (Integer) categoryTask[0]; // Category ID is Integer
+                    String category = getCategoryNameById(categoryId); // Get category name by ID
                     int taskCountSum = ((Number) categoryTask[1]).intValue();
-                    CategoryTasksSummary summary = new CategoryTasksSummary(category, taskCountSum);
+                    TasksSummary summary = new TasksSummary(category, taskCountSum);
                     categoryTaskSummaries.add(summary);
                 }
                 return categoryTaskSummaries;
             }
         }
         return Collections.emptyList(); // Return an empty list if user is not authenticated or authorized
+    }
+
+    // Helper method to get category name by ID
+    private String getCategoryNameById(int categoryId) {
+        CategoryEntity category = categoryDao.findCategoryById(categoryId);
+        return category.getCategoryName();
+    }
+
+    public List<DayCount> getCompletedTasksCumulativeCountForLastWeek() {
+        List<DayCount> counts = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        int cumulativeCount = 0;
+        for (int i = 6; i >= 0; i--) {
+            LocalDate currentDate = today.minusDays(i);
+            int taskCount = taskDao.countCompletedTasksByDate(currentDate);
+            cumulativeCount += taskCount;
+            counts.add(new DayCount(currentDate, cumulativeCount));
+        }
+        return counts;
+    }
+
+    public double getAverageTaskDuration() {
+        return taskDao.findAverageTaskDuration();
     }
 
     private TaskDto convertTaskFromEntityToDto(TaskEntity t) {
