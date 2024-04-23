@@ -1,22 +1,23 @@
 package paj.project5_vc.service;
 
-
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
-import java.util.Properties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.util.Properties;
 
 public class EmailService {
     private static final long serialVersionUID = 1L;
-
+    private static final Logger logger = LogManager.getLogger(EmailService.class);
     private static final String SMTP_HOST = "smtp.gmail.com";
-    private static final String SMTP_PORT = "587"; // Update with your SMTP server port
-    private static final String SMTP_USERNAME = "your-email@example.com"; // Update with your SMTP username
-    private static final String SMTP_PASSWORD = "your-email-password"; // Update with your SMTP password
+    private static final String SMTP_PORT = "587";
+    private static final String SMTP_USERNAME = "aor.scrum.board@gmail.com";
+    private static final String SMTP_PASSWORD = "Aor1904Qq";
 
     public static void sendConfirmationEmail(String recipientEmail, String token) {
         // Sender's email configuration
-        String from = "your-email@example.com"; // Update with your email address
+        String from = "aor.scrum.board@gmail.com";
 
         // Set properties
         Properties properties = new Properties();
@@ -43,16 +44,16 @@ public class EmailService {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
 
             // Set Subject: header field
-            message.setSubject("Email Confirmation");
+            message.setSubject("Confirmation Email");
 
             // Set Content: message body
             String confirmationLink = "http://your-api-domain/confirm/" + token; // Update with your confirmation endpoint
-            String body = "Click the following link to confirm your email: " + confirmationLink;
+            String body = "Click the following link to confirm your register: " + confirmationLink;
             message.setText(body);
 
             // Send message
             Transport.send(message);
-            System.out.println("Confirmation email sent successfully.");
+            logger.debug("Confirmation email sent successfully.");
         } catch (MessagingException mex) {
             mex.printStackTrace();
         }
