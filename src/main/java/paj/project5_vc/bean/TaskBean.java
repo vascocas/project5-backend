@@ -235,7 +235,11 @@ public class TaskBean implements Serializable {
                     t.setCompletedDate(LocalDate.now());
                     // Calculate and set duration in days
                     long duration = ChronoUnit.DAYS.between(t.getStartDate(), t.getCompletedDate());
-                    t.setDuration((int) duration);
+                    if (duration >= 0) {
+                        t.setDuration((int) duration);
+                    } else {
+                        t.setDuration(0);
+                    }
                 }
                 t.setState(newState); // Update the task state
                 return true;
