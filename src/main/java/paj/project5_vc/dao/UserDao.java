@@ -30,6 +30,15 @@ public class UserDao extends AbstractDao<UserEntity> {
         }
     }
 
+    public UserEntity findUserByValidationToken(String token) {
+        try {
+            return (UserEntity) em.createNamedQuery("User.findUserByValidationToken").setParameter("validationToken", token)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
     public UserEntity findUserByUsername(String username) {
         try {
             return (UserEntity) em.createNamedQuery("User.findUserByUsername").setParameter("username", username)

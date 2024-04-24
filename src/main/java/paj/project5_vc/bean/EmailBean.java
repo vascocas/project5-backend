@@ -1,19 +1,25 @@
-package paj.project5_vc.service;
+package paj.project5_vc.bean;
 
+import jakarta.ejb.Stateless;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.Properties;
 
-public class EmailService {
 
-    private static final Logger logger = LogManager.getLogger(EmailService.class);
+@Stateless
+public class EmailBean implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(EmailBean.class);
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
     private static final String SMTP_USERNAME = "aor.scrum.board@gmail.com";
-    private static final String SMTP_PASSWORD = "Aor1904Qq";
+    private static final String SMTP_PASSWORD = "vndlfjgdjkozdnpa";
+
+    // old pass: Aor1904Qq
 
     public static void sendConfirmationEmail(String recipientEmail, String token) {
         // Sender's email configuration
@@ -47,7 +53,7 @@ public class EmailService {
             message.setSubject("Confirmation Email");
 
             // Set Content: message body
-            String confirmationLink = "http://your-api-domain/confirm/" + token; // Update with your confirmation endpoint
+            String confirmationLink = "http://localhost:3000/validate/?validationToken=" + token;
             String body = "Click the following link to confirm your register: " + confirmationLink;
             message.setText(body);
 

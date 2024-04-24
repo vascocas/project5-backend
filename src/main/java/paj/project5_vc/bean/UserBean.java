@@ -42,6 +42,8 @@ public class UserBean implements Serializable {
     ConfigurationDao configDao;
     @EJB
     PassEncoder passEncoder;
+    @EJB
+    EmailBean email;
 
 
     public TokenDto getTokenTimer() {
@@ -66,13 +68,10 @@ public class UserBean implements Serializable {
         return false;
     }
 
-    //TODO
-    // incluir validação para user validated!!!!
-
     public LoginDto login(String username, String password) {
         LoginDto successLogin = new LoginDto();
         UserEntity userEntity = userDao.findUserByUsername(username);
-        if (userEntity != null && !userEntity.isDeleted()) {
+        if (userEntity != null && !userEntity.isDeleted() && userEntity.isValidated()) {
             // Retrieve the hashed password associated with the user
             String hashedPassword = userEntity.getPassword();
             // Check if the provided password matches the hashed password
@@ -118,22 +117,23 @@ public class UserBean implements Serializable {
         UserEntity userByEmail = userDao.findUserByEmail(user.getEmail());
         if ((userByUsername == null) && (userByEmail == null)) {
             UserEntity newUser = convertUserDtotoEntity(user);
+            String validationToken = generateNewToken();
+            newUser.setValidationToken(validationToken);
             newUser.setRole(UserRole.DEVELOPER);
             userDao.persist(newUser);
+            email.sendConfirmationEmail("aor.scrum.board@gmail.com", validationToken);
             return true;
         }
         return false;
     }
 
-    //TODO
-    // incluir validação para user role!!!!
-
-    public boolean validateUser(RoleDto user) {
-        UserEntity userEntity = userDao.findUserById(user.getId());
+    public boolean validateUser(String token) {
+        UserEntity userEntity = userDao.findUserByValidationToken(token);
         if (userEntity != null) {
-            userEntity.setValidated(true);
-            userDao.persist(userEntity);
-            return true;
+            if(userEntity.getValidationToken().equals(token)) {
+                userEntity.setValidated(true);
+                return true;
+            }
         }
         return false;
     }

@@ -212,11 +212,10 @@ public class UserService {
     @PUT
     @Path("/validate")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response validateUser(@HeaderParam("token") String token, RoleDto user) {
-        if (!userBean.tokenExist(token)) {
-            return Response.status(401).entity("Invalid token").build();
-        }
-        if (userBean.validateUser(user)) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response confirmEmail(@QueryParam("validationToken") String token) {
+        // Validate the token
+        if (userBean.validateUser(token)) {
             dashWeb.send("DashboardUserUpdate");
             return Response.status(200).entity("User validated successfully!").build();
         } else {

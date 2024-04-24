@@ -14,6 +14,7 @@ import paj.project5_vc.enums.UserRole;
 @Table(name = "user")
 @NamedQuery(name = "User.findUserByUsername", query = "SELECT u FROM UserEntity u WHERE u.username = :username AND u.deleted = false")
 @NamedQuery(name = "User.findUserByToken", query = "SELECT u FROM UserEntity u JOIN u.tokens t WHERE t.tokenValue = :token AND u.deleted = false")
+@NamedQuery(name = "User.findUserByValidationToken", query = "SELECT u FROM UserEntity u WHERE u.validationToken = :validationToken")
 @NamedQuery(name = "User.findUserByEmail", query = "SELECT u FROM UserEntity u WHERE u.email = :email AND u.deleted = false")
 @NamedQuery(name = "User.findUserById", query = "SELECT u FROM UserEntity u WHERE u.id = :id")
 @NamedQuery(name = "User.findAllActiveUsernames", query = "SELECT u FROM UserEntity u WHERE u.deleted = false ORDER BY u.username")
@@ -65,6 +66,9 @@ public class UserEntity implements Serializable {
 
     @Column(name = "validated", nullable = false)
     private boolean validated;
+
+    @Column(name = "validation_token", unique = true)
+    private String validationToken;
 
     @CreationTimestamp
     @Column(name = "register_at", nullable = false)
@@ -171,6 +175,14 @@ public class UserEntity implements Serializable {
 
     public void setValidated(boolean validated) {
         this.validated = validated;
+    }
+
+    public String getValidationToken() {
+        return validationToken;
+    }
+
+    public void setValidationToken(String validationToken) {
+        this.validationToken = validationToken;
     }
 
     public Timestamp getRegisterAt() {
