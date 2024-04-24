@@ -1,13 +1,11 @@
 package paj.project5_vc.service;
 
 import jakarta.ejb.EJB;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import paj.project5_vc.bean.NotificationBean;
 import paj.project5_vc.bean.UserBean;
-import paj.project5_vc.dto.MessageDto;
 import paj.project5_vc.dto.NotificationDto;
 
 import java.util.ArrayList;
@@ -15,11 +13,8 @@ import java.util.ArrayList;
 @Path("/notifications")
 public class NotificationService {
 
-    private static final long serialVersionUID = 1L;
-
     @EJB
     UserBean userBean;
-
     @EJB
     NotificationBean notificationBean;
 

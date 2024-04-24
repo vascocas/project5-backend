@@ -1,7 +1,6 @@
 package paj.project5_vc.service;
 
 import jakarta.ejb.EJB;
-import jakarta.inject.Inject;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import paj.project5_vc.bean.UserBean;
@@ -13,8 +12,6 @@ import jakarta.ws.rs.core.Response;
 
     @Path("/confirm")
     public class ConfirmationService {
-
-        private static final long serialVersionUID = 1L;
 
         @EJB
         UserBean userBean;
@@ -48,10 +45,10 @@ import jakarta.ws.rs.core.Response;
 
         private void sendConfirmationEmail(String recipientEmail, String token) {
             // Sender's email configuration
-            String from = "your-email@example.com";
+            String from = "aor.scrum.board@gmail.com";
             String host = "smtp.example.com";
-            String username = "your-email@example.com";
-            String password = "your-email-password";
+            String username = "aor.scrum.board@gmail.com";
+            String password = "Aor1904Qq";
 
             // Set properties
             Properties properties = System.getProperties();

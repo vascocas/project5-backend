@@ -16,7 +16,7 @@ import paj.project5_vc.enums.TaskState;
 import paj.project5_vc.enums.UserRole;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import java.text.DecimalFormat;
+
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -38,18 +38,6 @@ public class TaskBean implements Serializable {
     CategoryDao categoryDao;
 
     public TaskBean() {
-    }
-
-    public void setTaskDao(TaskDao taskDao) {
-        this.taskDao = taskDao;
-    }
-
-    public void setUserDao(UserDao userDao) {
-        this.userDao = userDao;
-    }
-
-    public void setCategoryDao(CategoryDao categoryDao) {
-        this.categoryDao = categoryDao;
     }
 
     public TaskDto addTask(String token, TaskDto t) {
@@ -75,6 +63,7 @@ public class TaskBean implements Serializable {
                 TaskEntity t = taskDao.findTaskById(id);
                 if (t != null) {
                     t.setDeleted(true);
+                    logger.info("User: " + user.getUsername() + " has removed the task id: " + t.getId());
                     return true;
                 }
             }
@@ -182,8 +171,7 @@ public class TaskBean implements Serializable {
             if (userRole == UserRole.SCRUM_MASTER || userRole == UserRole.PRODUCT_OWNER) {
                 ArrayList<TaskEntity> tasks = taskDao.findTasksByDeleted();
                 if (tasks != null) {
-                    ArrayList<TaskDto> taskDtos = convertTasksFromEntityListToDtoList(tasks);
-                    return taskDtos;
+                    return convertTasksFromEntityListToDtoList(tasks);
                 }
             }
         }
@@ -201,8 +189,7 @@ public class TaskBean implements Serializable {
                 if (ctgEntity != null) {
                     ArrayList<TaskEntity> tasks = taskDao.findTasksByCategoryId(ctgEntity.getId());
                     if (tasks != null) {
-                        ArrayList<TaskDto> taskDtos = convertTasksFromEntityListToDtoList(tasks);
-                        return taskDtos;
+                        return convertTasksFromEntityListToDtoList(tasks);
                     }
                 }
             }

@@ -12,6 +12,7 @@ import jakarta.ejb.EJB;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import paj.project5_vc.websocket.DashWeb;
 import paj.project5_vc.websocket.TaskWeb;
 
 import java.time.LocalDate;
@@ -21,12 +22,13 @@ import java.util.ArrayList;
 @Path("/tasks")
 public class TaskService {
 
-    private static final long serialVersionUID = 1L;
-
     @EJB
     UserBean userBean;
     @EJB
     TaskWeb taskWeb;
+
+    @EJB
+    DashWeb dashWeb;
     @EJB
     TaskBean taskBean;
     @EJB
@@ -171,6 +173,7 @@ public class TaskService {
         if (newTask != null) {
             System.out.println("Add new task");
             taskWeb.taskChange(token, "TasksChanged");
+            dashWeb.send("DashboardTaskUpdate");
             return Response.status(200).entity(newTask).build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
@@ -234,6 +237,7 @@ public class TaskService {
         }
         if (taskBean.updateTaskStatus(newStatus)) {
             taskWeb.taskChange(token, "TasksChanged");
+            dashWeb.send("DashboardTaskUpdate");
             return Response.status(200).entity("Task status updated successfully").build();
         } else {
             return Response.status(404).entity("Task not found").build();
@@ -249,8 +253,8 @@ public class TaskService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (taskBean.removeTask(token, taskId)) {
-            System.out.println("Delete task");
             taskWeb.taskChange(token,"TasksChanged");
+            dashWeb.send("DashboardTaskUpdate");
             return Response.status(200).entity("Task delete successfully").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
@@ -267,6 +271,7 @@ public class TaskService {
         }
         if (taskBean.restoreDeletedTask(token, taskId)) {
             taskWeb.taskChange(token, "TasksChanged");
+            dashWeb.send("DashboardTaskUpdate");
             return Response.status(200).entity("Task restored successfully").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();

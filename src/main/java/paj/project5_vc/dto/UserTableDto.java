@@ -11,7 +11,7 @@ public class UserTableDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @XmlElement
-    private ArrayList<UserManagmentDto> users;
+    private ArrayList<UserManagementDto> users;
     @XmlElement
     private int totalItems;
     @XmlElement
@@ -24,7 +24,7 @@ public class UserTableDto implements Serializable {
     public UserTableDto() {
     }
 
-    public UserTableDto(ArrayList<UserManagmentDto> users, int totalItems, int totalPages, int currentPage, int pageSize) {
+    public UserTableDto(ArrayList<UserManagementDto> users, int totalItems, int totalPages, int currentPage, int pageSize) {
         this.users = users;
         this.totalItems = totalItems;
         this.totalPages = totalPages;
@@ -33,11 +33,11 @@ public class UserTableDto implements Serializable {
     }
 
     // Getters and setters
-    public ArrayList<UserManagmentDto> getUsers() {
+    public ArrayList<UserManagementDto> getUsers() {
         return users;
     }
 
-    public void setUsers(ArrayList<UserManagmentDto> users) {
+    public void setUsers(ArrayList<UserManagementDto> users) {
         this.users = users;
     }
 

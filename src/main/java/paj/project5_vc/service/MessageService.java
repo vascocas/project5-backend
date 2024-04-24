@@ -3,7 +3,6 @@ package paj.project5_vc.service;
 import java.util.ArrayList;
 
 import jakarta.ejb.EJB;
-import jakarta.inject.Inject;
 import paj.project5_vc.bean.MessageBean;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -13,12 +12,9 @@ import paj.project5_vc.bean.UserBean;
 import paj.project5_vc.dto.MessageDto;
 import paj.project5_vc.websocket.MessageWeb;
 import paj.project5_vc.websocket.NotificationWeb;
-import paj.project5_vc.websocket.TaskWeb;
 
 @Path("/messages")
 public class MessageService {
-
-    private static final long serialVersionUID = 1L;
 
     @EJB
     MessageBean messageBean;

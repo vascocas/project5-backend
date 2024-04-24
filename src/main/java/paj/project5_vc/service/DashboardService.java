@@ -8,14 +8,11 @@ import paj.project5_vc.bean.TaskBean;
 import paj.project5_vc.bean.UserBean;
 import paj.project5_vc.dto.DayCount;
 import paj.project5_vc.dto.TasksSummary;
-import java.text.DecimalFormat;
 
 import java.util.List;
 
 @Path("/dashboard")
 public class DashboardService {
-
-    private static final long serialVersionUID = 1L;
 
     @EJB
     TaskBean taskBean;

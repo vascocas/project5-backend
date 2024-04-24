@@ -5,7 +5,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import paj.project5_vc.enums.UserRole;
 
 @XmlRootElement
-public class UserManagmentDto {
+public class UserManagementDto {
 
     @XmlElement
     private int id;
@@ -16,10 +16,10 @@ public class UserManagmentDto {
     @XmlElement
     private String email;
 
-    public UserManagmentDto() {
+    public UserManagementDto() {
     }
 
-    public UserManagmentDto(int id, String username, UserRole role, String email) {
+    public UserManagementDto(int id, String username, UserRole role, String email) {
         this.id = id;
         this.username = username;
         this.role = role;

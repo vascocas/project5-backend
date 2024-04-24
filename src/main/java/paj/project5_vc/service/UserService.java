@@ -3,21 +3,23 @@ package paj.project5_vc.service;
 import jakarta.ejb.EJB;
 import paj.project5_vc.bean.UserBean;
 import paj.project5_vc.dto.*;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import paj.project5_vc.enums.UserRole;
+import paj.project5_vc.websocket.DashWeb;
+
 
 import java.util.ArrayList;
 
 @Path("/users")
 public class UserService {
 
-    private static final long serialVersionUID = 1L;
-
     @EJB
     UserBean userBean;
+
+    @EJB
+    DashWeb dashWeb;
 
     // Get token timer(Session Timeout)
     @GET
@@ -59,7 +61,7 @@ public class UserService {
         return Response.status(200).entity(usernames).build();
     }
 
-    // Get list of active users (UserManagment dto)
+    // Get list of active users (UserManagement dto)
     @GET
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -87,7 +89,7 @@ public class UserService {
         }
     }
 
-    // Get list of deleted users (UserManagment dto)
+    // Get list of deleted users (UserManagement dto)
     @GET
     @Path("/deletedUsers")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -96,7 +98,7 @@ public class UserService {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid Token!").build();
         }
-        ArrayList<UserManagmentDto> users = userBean.getDeletedUsers(token);
+        ArrayList<UserManagementDto> users = userBean.getDeletedUsers(token);
         if (users != null) {
             return Response.status(200).entity(users).build();
         } else {
@@ -199,6 +201,7 @@ public class UserService {
         }
         // Proceed with registering the user
         if (userBean.register(user)) {
+            dashWeb.send("DashboardUserUpdate");
             return Response.status(200).entity("Registration Successful!").build();
         } else {
             return Response.status(401).entity("Verify all fields. Username and Email must be unique").build();
@@ -214,6 +217,7 @@ public class UserService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (userBean.validateUser(user)) {
+            dashWeb.send("DashboardUserUpdate");
             return Response.status(200).entity("User validated successfully!").build();
         } else {
             return Response.status(404).entity("User not found or validation failed!").build();
@@ -376,6 +380,7 @@ public class UserService {
             return Response.status(401).entity("Invalid Token!").build();
         }
         if (userBean.deleteUser(token, userId)) {
+            dashWeb.send("DashboardUserUpdate");
             return Response.status(200).entity("Profile deleted").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();

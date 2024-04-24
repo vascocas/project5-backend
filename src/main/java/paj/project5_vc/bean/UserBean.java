@@ -373,7 +373,7 @@ public class UserBean implements Serializable {
         return null;
     }
 
-    public ArrayList<UserManagmentDto> getDeletedUsers(String token) {
+    public ArrayList<UserManagementDto> getDeletedUsers(String token) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {
             UserRole userRole = userEntity.getRole();
@@ -556,11 +556,11 @@ public class UserBean implements Serializable {
         return roleDtos;
     }
 
-    private ArrayList<UserManagmentDto> convertUsersFromEntityToUserManagmentDtoList
+    private ArrayList<UserManagementDto> convertUsersFromEntityToUserManagmentDtoList
             (ArrayList<UserEntity> userEntityEntities) {
-        ArrayList<UserManagmentDto> usersDtos = new ArrayList<>();
+        ArrayList<UserManagementDto> usersDtos = new ArrayList<>();
         for (UserEntity u : userEntityEntities) {
-            UserManagmentDto userDto = new UserManagmentDto();
+            UserManagementDto userDto = new UserManagementDto();
             userDto.setId(u.getId());
             userDto.setUsername(u.getUsername());
             userDto.setRole(u.getRole());

@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Properties;
 
 public class EmailService {
-    private static final long serialVersionUID = 1L;
+
     private static final Logger logger = LogManager.getLogger(EmailService.class);
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
