@@ -16,6 +16,7 @@ import paj.project5_vc.enums.TaskState;
 import paj.project5_vc.enums.UserRole;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
+import java.text.DecimalFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;

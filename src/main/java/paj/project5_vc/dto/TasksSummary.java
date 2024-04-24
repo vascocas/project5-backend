@@ -17,8 +17,8 @@ public class TasksSummary implements Serializable {
     public TasksSummary() {
     }
 
-    public TasksSummary(String category, int sum) {
-        this.field = category;
+    public TasksSummary(String field, int sum) {
+        this.field = field;
         this.sum = sum;
     }
 
@@ -41,7 +41,7 @@ public class TasksSummary implements Serializable {
 
     @Override
     public String toString() {
-        return "category='" + field + '\'' +
+        return "field='" + field + '\'' +
                 ", sum=" + sum;
     }
 }

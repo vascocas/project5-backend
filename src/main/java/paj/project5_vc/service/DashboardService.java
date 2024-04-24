@@ -8,6 +8,7 @@ import paj.project5_vc.bean.TaskBean;
 import paj.project5_vc.bean.UserBean;
 import paj.project5_vc.dto.DayCount;
 import paj.project5_vc.dto.TasksSummary;
+import java.text.DecimalFormat;
 
 import java.util.List;
 
@@ -90,8 +91,10 @@ public class DashboardService {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        double averageTaskDuration = taskBean.getAverageTaskDuration();
-        return Response.status(200).entity(averageTaskDuration).build();
+        double averageDuration = taskBean.getAverageTaskDuration();
+        // Round the averageTaskDuration to two decimal places
+        double resultAverageDuration = Math.round(averageDuration * 100.0) / 100.0;
+        return Response.status(200).entity(resultAverageDuration).build();
     }
 
     // Get the count of validated users for the last week
