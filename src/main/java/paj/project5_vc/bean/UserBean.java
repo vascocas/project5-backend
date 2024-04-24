@@ -130,7 +130,7 @@ public class UserBean implements Serializable {
     public boolean validateUser(String token) {
         UserEntity userEntity = userDao.findUserByValidationToken(token);
         if (userEntity != null) {
-            if(userEntity.getValidationToken().equals(token)) {
+            if (userEntity.getValidationToken().equals(token)) {
                 userEntity.setValidated(true);
                 return true;
             }
@@ -261,6 +261,18 @@ public class UserBean implements Serializable {
                     u.setPhoto(user.getPhoto());
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    public boolean validateNewPassword(PasswordDto firstPass) {
+        UserEntity userEntity = userDao.findUserByValidationToken(firstPass.getPassword());
+        if (userEntity != null) {
+            if (firstPass.getNewPass().equals(firstPass.getConfirmPass())) {
+                String encryptedPassword = passEncoder.encode(firstPass.getNewPass());
+                userEntity.setPassword(encryptedPassword);
+                return true;
             }
         }
         return false;
@@ -484,9 +496,6 @@ public class UserBean implements Serializable {
     private UserEntity convertUserDtotoEntity(UserDto user) {
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(user.getUsername());
-        // Encrypt the password before storing
-        String encryptedPassword = passEncoder.encode(user.getPassword());
-        userEntity.setPassword(encryptedPassword);
         userEntity.setEmail(user.getEmail());
         userEntity.setFirstName(user.getFirstName());
         userEntity.setLastName(user.getLastName());

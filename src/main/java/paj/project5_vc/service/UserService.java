@@ -184,9 +184,6 @@ public class UserService {
         if (user.getUsername() == null || user.getUsername().isEmpty()) {
             return Response.status(400).entity("Username cannot be empty").build();
         }
-        if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            return Response.status(400).entity("Password cannot be empty").build();
-        }
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             return Response.status(400).entity("Email cannot be empty").build();
         }
@@ -284,6 +281,24 @@ public class UserService {
         }
         if (userBean.editUsersProfile(user, token)) {
             return Response.status(200).entity("Profile updated!").build();
+        } else {
+            return Response.status(403).entity("Unauthorized").build();
+        }
+    }
+
+    // Edit user password
+    @PUT
+    @Path("/create/password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response firstPassword(PasswordDto newPassword) {
+        if (newPassword.getNewPass() == null || newPassword.getNewPass().isEmpty()) {
+            return Response.status(401).entity("Password cannot be empty").build();
+        }
+        if (newPassword.getConfirmPass() == null || newPassword.getConfirmPass().isEmpty()) {
+            return Response.status(401).entity("Password cannot be empty").build();
+        }
+        if (userBean.validateNewPassword(newPassword)) {
+            return Response.status(200).entity("New password created!").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();
         }
