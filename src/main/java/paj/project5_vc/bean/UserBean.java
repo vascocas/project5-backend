@@ -138,6 +138,32 @@ public class UserBean implements Serializable {
         return false;
     }
 
+    public boolean emailRecoveryPassword(RoleDto user) {
+        // Find the user with the provided username
+        UserEntity userByUsername = userDao.findUserByUsername(user.getUsername());
+        if ((userByUsername != null) && (userByUsername.isValidated())) {
+            String resetToken = generateNewToken();
+            userByUsername.setValidationToken(resetToken);
+            email.sendResetPasswordEmail("aor.scrum.board@gmail.com", resetToken);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean resetForgottenPassword(String token, PasswordDto passwordDto) {
+        UserEntity userEntity = userDao.findUserByValidationToken(token);
+        if (userEntity != null) {
+            if (userEntity.getValidationToken().equals(token)) {
+                if (passwordDto.getNewPass().equals(passwordDto.getConfirmPass())) {
+                    String encryptedPassword = passEncoder.encode(passwordDto.getNewPass());
+                    userEntity.setPassword(encryptedPassword);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public UserDto createUser(String token, UserDto user) {
         UserEntity userEntity = userDao.findUserByToken(token);
         if (userEntity != null) {

@@ -199,7 +199,7 @@ public class UserService {
         // Proceed with registering the user
         if (userBean.register(user)) {
             dashWeb.send("DashboardUserUpdate");
-            return Response.status(200).entity("Registration Successful!").build();
+            return Response.status(200).entity("Registration Successful! Please verify your email.").build();
         } else {
             return Response.status(401).entity("Verify all fields. Username and Email must be unique").build();
         }
@@ -211,12 +211,37 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response confirmEmail(@QueryParam("validationToken") String token) {
-        // Validate the token
         if (userBean.validateUser(token)) {
             dashWeb.send("DashboardUserUpdate");
             return Response.status(200).entity("User validated successfully!").build();
         } else {
             return Response.status(404).entity("User not found or validation failed!").build();
+        }
+    }
+
+    // Send reset password email
+    @PUT
+    @Path("/reset/email")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response recoveryPasswordEmail(RoleDto user) {
+        if (userBean.emailRecoveryPassword(user)) {
+            return Response.status(200).entity("Email sent successfully!").build();
+        } else {
+            return Response.status(404).entity("Sending email failed!").build();
+        }
+    }
+
+    // Reset a password for forgotten password
+    @PUT
+    @Path("/reset")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response resetPassword(@QueryParam("resetToken") String resetToken, PasswordDto passwordDto) {
+        if (userBean.resetForgottenPassword(resetToken, passwordDto)) {
+            return Response.status(200).entity("Password updated successfully!").build();
+        } else {
+            return Response.status(404).entity("Password update failed!").build();
         }
     }
 
