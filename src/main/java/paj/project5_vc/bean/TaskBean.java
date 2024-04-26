@@ -71,7 +71,7 @@ public class TaskBean implements Serializable {
         return false;
     }
 
-    public boolean removeAllUserTasks(String token, int userId) {
+    public ArrayList<TaskDto> removeAllUserTasks(String token, int userId) {
         // Get user role by token
         UserEntity user = userDao.findUserByToken(token);
         if (user != null) {
@@ -85,12 +85,13 @@ public class TaskBean implements Serializable {
                         for (TaskEntity t : tasks) {
                             t.setDeleted(true);
                         }
-                        return true;
+                        ArrayList<TaskDto> returningTasks = convertTasksFromEntityListToDtoList(tasks);
+                        return returningTasks;
                     }
                 }
             }
         }
-        return false;
+        return new ArrayList<>();
     }
 
     public boolean restoreDeletedTask(String token, int id) {

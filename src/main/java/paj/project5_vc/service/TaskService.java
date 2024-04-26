@@ -6,6 +6,7 @@ import paj.project5_vc.bean.UserBean;
 import paj.project5_vc.dao.CategoryDao;
 import paj.project5_vc.dto.*;
 import paj.project5_vc.entity.CategoryEntity;
+import paj.project5_vc.entity.TaskEntity;
 import paj.project5_vc.enums.TaskPriority;
 import paj.project5_vc.enums.TaskState;
 import jakarta.ejb.EJB;
@@ -253,7 +254,7 @@ public class TaskService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (taskBean.removeTask(token, taskId)) {
-            taskWeb.taskChange(token,"TasksChanged");
+            taskWeb.taskChange(token, "TasksChanged");
             dashWeb.send("DashboardTaskUpdate");
             return Response.status(200).entity("Task delete successfully").build();
         } else {
@@ -301,11 +302,8 @@ public class TaskService {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        if (taskBean.removeAllUserTasks(token, userId)) {
-            return Response.status(200).entity("Tasks deleted successfully").build();
-        } else {
-            return Response.status(403).entity("Unauthorized").build();
-        }
+        ArrayList<TaskDto> tasks = taskBean.removeAllUserTasks(token, userId);
+        return Response.status(200).entity(tasks).build();
     }
 
     // Return all Categories
