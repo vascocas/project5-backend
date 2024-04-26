@@ -157,6 +157,7 @@ public class UserBean implements Serializable {
                 if (passwordDto.getNewPass().equals(passwordDto.getConfirmPass())) {
                     String encryptedPassword = passEncoder.encode(passwordDto.getNewPass());
                     userEntity.setPassword(encryptedPassword);
+                    userEntity.setValidationToken(null);
                     return true;
                 }
             }
@@ -298,6 +299,7 @@ public class UserBean implements Serializable {
             if (firstPass.getNewPass().equals(firstPass.getConfirmPass())) {
                 String encryptedPassword = passEncoder.encode(firstPass.getNewPass());
                 userEntity.setPassword(encryptedPassword);
+                userEntity.setValidationToken(null);
                 return true;
             }
         }
@@ -313,27 +315,6 @@ public class UserBean implements Serializable {
                 String encryptedPassword = passEncoder.encode(newPass.getNewPass());
                 userEntity.setPassword(encryptedPassword);
                 return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean editUsersPassword(String token, PasswordDto newPass) {
-        // Get user role by token
-        UserEntity userEntity = userDao.findUserByToken(token);
-        if (userEntity != null) {
-            UserRole userRole = userEntity.getRole();
-            // Check if the user is a DEVELOPER or SCRUM_MASTER: can only edit own profile
-            if (userRole != UserRole.DEVELOPER && userRole != UserRole.SCRUM_MASTER) {
-                UserEntity u = userDao.findUserById(newPass.getId());
-                if (u != null) {
-                    String hashedPassword = u.getPassword();
-                    if ((passEncoder.matches(newPass.getPassword(), hashedPassword)) && (newPass.getNewPass().equals(newPass.getConfirmPass()))) {
-                        String encryptedPassword = passEncoder.encode(newPass.getNewPass());
-                        u.setPassword(encryptedPassword);
-                        return true;
-                    }
-                }
             }
         }
         return false;

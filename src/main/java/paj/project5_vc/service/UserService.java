@@ -311,7 +311,7 @@ public class UserService {
         }
     }
 
-    // Edit user password
+    // Create user password
     @PUT
     @Path("/create/password")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -350,27 +350,6 @@ public class UserService {
         }
     }
 
-    // Edit different user password
-    @PUT
-    @Path("/othersPassword")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response editOthersPassword(@HeaderParam("token") String token, PasswordDto newPassword) {
-        if (!userBean.tokenExist(token)) {
-            return Response.status(401).entity("Invalid Token!").build();
-        }
-        if (newPassword.getNewPass() == null || newPassword.getNewPass().isEmpty()) {
-            return Response.status(401).entity("Password cannot be empty").build();
-        }
-        if (newPassword.getConfirmPass() == null || newPassword.getConfirmPass().isEmpty()) {
-            return Response.status(401).entity("Password cannot be empty").build();
-        }
-        if (userBean.editUsersPassword(token, newPassword)) {
-            return Response.status(200).entity("Password updated!").build();
-        } else {
-            return Response.status(403).entity("Unauthorized").build();
-        }
-    }
-
     // Creates a new user
     @POST
     @Path("/createUser")
@@ -379,9 +358,6 @@ public class UserService {
         // Validate the UserDto inputs
         if (user.getUsername() == null || user.getUsername().isEmpty()) {
             return Response.status(401).entity("Username cannot be empty").build();
-        }
-        if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            return Response.status(401).entity("Password cannot be empty").build();
         }
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             return Response.status(401).entity("Email cannot be empty").build();
@@ -408,7 +384,6 @@ public class UserService {
         } else return Response.status(403).entity("Unauthorized").build();
     }
 
-
     // Delete user by username (Recycle bin)
     @PUT
     @Path("/remove/{userId}")
@@ -424,7 +399,6 @@ public class UserService {
         } else {
             return Response.status(403).entity("Unauthorized").build();
         }
-
     }
 
     // Edit user role
