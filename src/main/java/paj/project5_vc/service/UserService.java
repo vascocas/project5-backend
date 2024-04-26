@@ -280,7 +280,7 @@ public class UserService {
         if (userBean.editProfile(user, token)) {
             return Response.status(200).entity("Profile updated!").build();
         } else {
-            return Response.status(403).entity("Unauthorized").build();
+            return Response.status(403).entity("Unauthorized or invalid parameters").build();
         }
     }
 
