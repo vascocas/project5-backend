@@ -176,8 +176,11 @@ public class UserBean implements Serializable {
                 UserEntity userByEmail = userDao.findUserByEmail(user.getEmail());
                 if ((userByUsername == null) && (userByEmail == null)) {
                     UserEntity newUser = convertUserDtotoEntity(user);
+                    String validationToken = generateNewToken();
+                    newUser.setValidationToken(validationToken);
                     newUser.setRole(user.getRole());
                     userDao.persist(newUser);
+                    email.sendConfirmationEmail("aor.scrum.board@gmail.com", validationToken);
                     return convertUserEntitytoUserDto(newUser);
                 }
             }
