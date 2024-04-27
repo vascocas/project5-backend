@@ -381,7 +381,7 @@ public class UserService {
         UserDto newUser = userBean.createUser(token, user);
         if (newUser != null) {
             return Response.status(200).entity(newUser).build();
-        } else return Response.status(403).entity("Unauthorized").build();
+        } else return Response.status(403).entity("Unauthorized or invalid input fields").build();
     }
 
     // Delete user by username (Recycle bin)

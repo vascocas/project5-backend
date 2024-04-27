@@ -77,7 +77,9 @@ public class DashboardService {
             return Response.status(401).entity("Invalid token").build();
         }
         double averageTasksPerUser = userBean.getAverageTasksPerUser(token);
-        return Response.status(200).entity(averageTasksPerUser).build();
+        // Round the averageTasksPerUser to two decimal places
+        double resultTasksPerUser = Math.round(averageTasksPerUser * 100.0) / 100.0;
+        return Response.status(200).entity(resultTasksPerUser).build();
     }
 
     // Endpoint to get the average task duration
