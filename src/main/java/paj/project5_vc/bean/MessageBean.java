@@ -59,15 +59,15 @@ public class MessageBean implements Serializable {
     }
 
     // Method for marking a message as read
-    public boolean markMessageAsRead(int messageId) {
-        MessageEntity message = messageDao.findById(messageId);
-            if (message != null) {
-                int senderId = message.getSender().getId();
-                int receiverId = message.getReceiver().getId();
-                ArrayList<MessageEntity> previousMessages = messageDao.findPreviousChatMessages(senderId, receiverId, message.getSentTime());
+    public boolean markMessageAsRead(MessageDto message) {
+        MessageEntity messageEntity = messageDao.findById(message.getId());
+            if (messageEntity != null) {
+                int senderId = messageEntity.getSender().getId();
+                int receiverId = messageEntity.getReceiver().getId();
+                ArrayList<MessageEntity> previousMessages = messageDao.findPreviousChatMessages(senderId, receiverId, messageEntity.getSentTime());
                 // Mark all previous messages as read
                 for (MessageEntity prevMessage : previousMessages) {
-                    if(prevMessage.getReceiver().getId() == message.getReceiver().getId()) {
+                    if(prevMessage.getReceiver().getId() == messageEntity.getReceiver().getId()) {
                         prevMessage.setReadStatus(true);
                     }
                 }

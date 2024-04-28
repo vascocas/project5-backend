@@ -254,7 +254,7 @@ public class TaskService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (taskBean.removeTask(token, taskId)) {
-            taskWeb.taskChange(token, "TasksChanged");
+            taskWeb.taskChange(token, "TasksDeleted");
             dashWeb.send("DashboardTaskUpdate");
             return Response.status(200).entity("Task delete successfully").build();
         } else {
@@ -271,7 +271,7 @@ public class TaskService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (taskBean.restoreDeletedTask(token, taskId)) {
-            taskWeb.taskChange(token, "TasksChanged");
+            taskWeb.taskChange(token, "TasksRestored");
             dashWeb.send("DashboardTaskUpdate");
             return Response.status(200).entity("Task restored successfully").build();
         } else {
@@ -288,6 +288,7 @@ public class TaskService {
             return Response.status(401).entity("Invalid token").build();
         }
         if (taskBean.removeTaskPermanently(token, taskId)) {
+            taskWeb.taskChange(token, "TasksDeleted");
             return Response.status(200).entity("Task deleted permanently").build();
         }
         return Response.status(403).entity("Unauthorized").build();
@@ -303,6 +304,7 @@ public class TaskService {
             return Response.status(401).entity("Invalid token").build();
         }
         ArrayList<TaskDto> tasks = taskBean.removeAllUserTasks(token, userId);
+        taskWeb.taskChange(token, "TasksChanged");
         return Response.status(200).entity(tasks).build();
     }
 

@@ -82,6 +82,7 @@ public class MessageService {
     @POST
     @Path("/send")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response sendMessage(@HeaderParam("token") String token, MessageDto messageDto) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
@@ -91,7 +92,8 @@ public class MessageService {
             return Response.status(400).entity("Message text cannot be empty").build();
         }
         if (messageBean.sendMessage(messageDto)) {
-            messageWeb.send(token, messageDto.getReceiverId(),"MessagesChanged");
+            String webMessage = "{\"senderId\":" + messageDto.getSenderId() + ",\"receiverId\":" + messageDto.getReceiverId() + "}";
+            messageWeb.send(messageDto.getReceiverId(),webMessage);
             notifWeb.send(messageDto.getReceiverId(),"NotificationUpdate");
             return Response.status(200).entity("Message sent!").build();
         } else {
@@ -101,14 +103,16 @@ public class MessageService {
 
     // Endpoint to mark a message as read
     @PUT
-    @Path("/read/{messageId}")
+    @Path("/read")
+    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response markMessageAsRead(@HeaderParam("token") String token, @PathParam("messageId") int messageId) {
+    public Response markMessageAsRead(@HeaderParam("token") String token, MessageDto message) {
         if (!userBean.tokenExist(token)) {
             return Response.status(401).entity("Invalid token").build();
         }
-        if (messageBean.markMessageAsRead(messageId)) {
-            messageWeb.markRead("MessagesChanged");
+        if (messageBean.markMessageAsRead(message)) {
+            String webMessage = "{\"senderId\":" + message.getSenderId() + ",\"receiverId\":" + message.getReceiverId() + "}";
+            messageWeb.send(message.getSenderId(), webMessage);
             return Response.status(200).entity("Messages marked as read!").build();
         } else {
             return Response.status(403).entity("Unauthorized").build();

@@ -125,20 +125,23 @@ class MessageBeanTest {
     @Test
     void givenNonExistentMessageIdWhenMarkMessageAsReadThenReturnFalse() {
         // given
-        int messageId = 0;
-        when(messageDaoMock.findById(messageId)).thenReturn(null);
+        MessageDto messageDto = new MessageDto();
+        messageDto.setId(0);
+
+        when(messageDaoMock.findById(messageDto.getId())).thenReturn(null);
         // when
-        boolean result = messageBean.markMessageAsRead(messageId);
+        boolean result = messageBean.markMessageAsRead(messageDto);
         // then
         assertFalse(result);
-        verify(messageDaoMock, times(1)).findById(messageId);
+        verify(messageDaoMock, times(1)).findById(messageDto.getId());
     }
 
     @Test
     void givenExistentMessageIdWithPrevMessagesWhenMarkMessageAsReadThenReturnTrue() {
 
         // given
-        int messageId = 1;
+        MessageDto messageDto = new MessageDto();
+        messageDto.setId(1);
         MessageEntity testMessage = new MessageEntity();
         UserEntity senderUser = new UserEntity();
         senderUser.setId(5);
@@ -151,23 +154,24 @@ class MessageBeanTest {
         ArrayList<MessageEntity> getMessages = new ArrayList<>();
         getMessages.add(testMessage);
 
-        when(messageDaoMock.findById(messageId)).thenReturn(testMessage);
+        when(messageDaoMock.findById(messageDto.getId())).thenReturn(testMessage);
 
         when(messageDaoMock.findPreviousChatMessages(senderUser.getId(), receiverUser.getId(),sentTime)).thenReturn(getMessages);
 
         // when
-        boolean result = messageBean.markMessageAsRead(messageId);
+        boolean result = messageBean.markMessageAsRead(messageDto);
 
         // then
         assertTrue(result);
         assertTrue(testMessage.isReadStatus());
-        verify(messageDaoMock, times(1)).findById(messageId);
+        verify(messageDaoMock, times(1)).findById(messageDto.getId());
         verify(messageDaoMock, times(1)).findPreviousChatMessages(senderUser.getId(), receiverUser.getId(),sentTime);
     }
     @Test
     void givenExistentMessageIdWithoutPrevMessagesWhenMarkMessageAsReadThenReturnTrue() {
         // given
-        int messageId = 1;
+        MessageDto messageDto = new MessageDto();
+        messageDto.setId(1);
         MessageEntity testMessage = new MessageEntity();
         UserEntity senderUser = new UserEntity();
         senderUser.setId(5);
@@ -184,19 +188,19 @@ class MessageBeanTest {
         ArrayList<MessageEntity> getMessages = new ArrayList<>();
         getMessages.add(test2Message);
 
-        when(messageDaoMock.findById(messageId)).thenReturn(testMessage);
+        when(messageDaoMock.findById(messageDto.getId())).thenReturn(testMessage);
 
         when(messageDaoMock.findPreviousChatMessages(senderUser.getId(), receiverUser.getId(),sentTime)).thenReturn(getMessages);
 
         // when
-        boolean result = messageBean.markMessageAsRead(messageId);
+        boolean result = messageBean.markMessageAsRead(messageDto);
 
         // then
         assertTrue(result);
         assertFalse(testMessage.isReadStatus());
         assertFalse(test2Message.isReadStatus());
 
-        verify(messageDaoMock, times(1)).findById(messageId);
+        verify(messageDaoMock, times(1)).findById(messageDto.getId());
         verify(messageDaoMock, times(1)).findPreviousChatMessages(senderUser.getId(), receiverUser.getId(),sentTime);
     }
 

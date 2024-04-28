@@ -524,7 +524,6 @@ public class UserBean implements Serializable {
         UserDto userDto = new UserDto();
         userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
-        userDto.setPassword(user.getPassword());
         userDto.setEmail(user.getEmail());
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());

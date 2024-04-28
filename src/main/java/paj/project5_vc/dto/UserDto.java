@@ -14,8 +14,6 @@ public class UserDto {
     @XmlElement
     private String username;
     @XmlElement
-    private String password;
-    @XmlElement
     private String email;
     @XmlElement
     private String firstName;
@@ -37,9 +35,8 @@ public class UserDto {
     public UserDto() {
     }
 
-    public UserDto(String username, String password, String email, String firstName, String lastName, String phone, String photo, UserRole role, boolean deleted, boolean validated) {
+    public UserDto(String username, String email, String firstName, String lastName, String phone, String photo, UserRole role, boolean deleted, boolean validated) {
         this.username = username;
-        this.password = password;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -64,14 +61,6 @@ public class UserDto {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
