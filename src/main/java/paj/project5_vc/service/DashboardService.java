@@ -29,10 +29,6 @@ public class DashboardService {
             return Response.status(401).entity("Invalid token").build();
         }
         String userCounts = userBean.getUsersCount(token);
-        if (userCounts.isEmpty()) {
-            // Handle the case where the userCounts is empty
-            return Response.status(404).entity("No results found").build();
-        }
         return Response.status(200).entity(userCounts).build();
     }
 
@@ -45,10 +41,6 @@ public class DashboardService {
             return Response.status(401).entity("Invalid token").build();
         }
         List<TasksSummary> stateTasks = taskBean.countTasksByStatus(token);
-        if (stateTasks.isEmpty()) {
-            // Handle the case where List<TasksSummary> is empty
-            return Response.status(404).entity("No results found").build();
-        }
         return Response.status(200).entity(stateTasks).build();
     }
 
@@ -61,10 +53,6 @@ public class DashboardService {
             return Response.status(401).entity("Invalid token").build();
         }
         List<TasksSummary> categoryTasks = taskBean.getCategoryTasksBySum(token);
-        if (categoryTasks.isEmpty()) {
-            // Handle the case where List<TasksSummary> is empty
-            return Response.status(404).entity("No results found").build();
-        }
         return Response.status(200).entity(categoryTasks).build();
     }
 
@@ -105,10 +93,6 @@ public class DashboardService {
             return Response.status(401).entity("Invalid token").build();
         }
         List<DayCount> validatedUsersCountForLastWeek = userBean.getRegisteredUsersCountForLastWeek();
-        if (validatedUsersCountForLastWeek.isEmpty()) {
-            // Handle the case where List<DayCount> is empty
-            return Response.status(404).entity("No results found").build();
-        }
         return Response.status(200).entity(validatedUsersCountForLastWeek).build();
     }
 
@@ -121,10 +105,6 @@ public class DashboardService {
             return Response.status(401).entity("Invalid token").build();
         }
         List<DayCount> result = taskBean.getCompletedTasksCumulative();
-        if (result.isEmpty()) {
-            // Handle the case where List<DayCount> is empty
-            return Response.status(404).entity("No results found").build();
-        }
         return Response.status(200).entity(result).build();
     }
 
