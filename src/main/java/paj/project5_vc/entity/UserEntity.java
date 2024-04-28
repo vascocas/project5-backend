@@ -90,7 +90,7 @@ public class UserEntity implements Serializable {
     private Set<MessageEntity> receivedMessages;
 
     @OneToMany(mappedBy = "recipientUser")
-    private Set<NotificationEntity> recipientUser;
+    private Set<NotificationEntity> inNotifications;
 
 
     //default empty constructor
@@ -233,11 +233,11 @@ public class UserEntity implements Serializable {
         this.receivedMessages = receivedMessages;
     }
 
-    public Set<NotificationEntity> getRecipientUser() {
-        return recipientUser;
+    public Set<NotificationEntity> getInNotifications() {
+        return inNotifications;
     }
 
-    public void setRecipientUser(Set<NotificationEntity> recipientUser) {
-        this.recipientUser = recipientUser;
+    public void setInNotifications(Set<NotificationEntity> inNotifications) {
+        this.inNotifications = inNotifications;
     }
 }

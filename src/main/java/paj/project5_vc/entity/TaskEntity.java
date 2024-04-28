@@ -34,7 +34,7 @@ public class TaskEntity implements Serializable {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private int id;
 
-    @Column(name = "title", nullable = false, length = 50)
+    @Column(name = "title", nullable = false, length = 80)
     private String title;
 
     @Column(name = "description", nullable = false, length = 65500, columnDefinition = "TEXT")

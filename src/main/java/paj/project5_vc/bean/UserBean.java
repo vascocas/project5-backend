@@ -8,10 +8,7 @@ import paj.project5_vc.dao.TaskDao;
 import paj.project5_vc.dao.TokenDao;
 import paj.project5_vc.dao.UserDao;
 import paj.project5_vc.dto.*;
-import paj.project5_vc.entity.ConfigurationEntity;
-import paj.project5_vc.entity.TaskEntity;
-import paj.project5_vc.entity.TokenEntity;
-import paj.project5_vc.entity.UserEntity;
+import paj.project5_vc.entity.*;
 import paj.project5_vc.enums.TaskState;
 import paj.project5_vc.enums.UserRole;
 import jakarta.ejb.EJB;
@@ -437,6 +434,15 @@ public class UserBean implements Serializable {
                 if (u != null) {
                     for (TaskEntity task : u.getTasks()) {
                         task.setCreator(null);
+                    }
+                    for (NotificationEntity n : u.getInNotifications()) {
+                        n.setRecipientUser(null);
+                    }
+                    for (MessageEntity m : u.getReceivedMessages()) {
+                        m.setReceiver(null);
+                    }
+                    for (MessageEntity m : u.getSentMessages()) {
+                        m.setSender(null);
                     }
                     userDao.remove(u);
                     return true;
