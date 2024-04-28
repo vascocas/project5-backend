@@ -9,16 +9,18 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 @Singleton
 @ServerEndpoint("/websocket/dashboard/{token}")
 public class DashWeb {
     private static final Logger logger = LogManager.getLogger(DashWeb.class);
-    HashMap<String, Session> sessions = new HashMap<>();
+    HashMap<String, Session> dashSessions = new HashMap<>();
 
     public void send(String message) {
         // Iterate over all sessions
-        for (Session s : sessions.values()) {
+        for (Session s : dashSessions.values()) {
             try {
                 if (s.isOpen()) {
                     // Send a dashboard WebSocket message
@@ -33,16 +35,20 @@ public class DashWeb {
     @OnOpen
     public void toDoOnOpen(Session session, @PathParam("token") String token) {
         logger.info("A new WebSocket session is opened for client");
-        sessions.put(token, session);
+        dashSessions.put(token, session);
     }
 
     @OnClose
     public void toDoOnClose(Session session, CloseReason reason) {
         logger.info("Websocket session is closed with CloseCode: " +
                 reason.getCloseCode() + ": " + reason.getReasonPhrase());
-        for (String key : sessions.keySet()) {
-            if (sessions.get(key) == session)
-                sessions.remove(key);
+        // Create an iterator to safely remove elements
+        Iterator<Map.Entry<String, Session>> iterator = dashSessions.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Session> entry = iterator.next();
+            if (entry.getValue().equals(session)) {
+                iterator.remove(); // Safely remove the entry using the iterator
+            }
         }
     }
 

@@ -44,38 +44,6 @@ public class MessageDao extends AbstractDao<MessageEntity> {
         }
     }
 
-    public ArrayList<MessageEntity> findMessagesForUser(UserEntity user) {
-        try {
-            return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findMessagesForUser")
-                    .setParameter("user", user)
-                    .getResultList();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-
-    // Method to find messages for a specific user
-    public ArrayList<MessageEntity> findMessagesFromUser(UserEntity user) {
-        try {
-            return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findMessagesFromUser")
-                    .setParameter("user", user)
-                    .getResultList();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    public ArrayList<MessageEntity> findAllUserMessages(UserEntity user) {
-        try {
-            return (ArrayList<MessageEntity>) em.createNamedQuery("Message.findAllUserMessages")
-                    .setParameter("user", user)
-                    .getResultList();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
     // Method to find messages changed between two users (sent/received messages)
     public ArrayList<MessageEntity> findChangedMessages(int senderId, int receiverId) {
         try {

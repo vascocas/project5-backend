@@ -20,50 +20,11 @@ public class MessageService {
     MessageBean messageBean;
     @EJB
     UserBean userBean;
-
     @EJB
     MessageWeb messageWeb;
     @EJB
     NotificationWeb notifWeb;
 
-    // Endpoint to get all user messages
-    @GET
-    @Path("/{userId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllMessagesUser(@HeaderParam("token") String token, @PathParam("userId") int userId) {
-        if (!userBean.tokenExist(token)) {
-            return Response.status(401).entity("Invalid token").build();
-        }
-        ArrayList<MessageDto> messages = messageBean.getAllUserMessages(userId);
-        return Response.status(200).entity(messages).build();
-    }
-
-    // Endpoint to get messages for a user (Received)
-    @GET
-    @Path("/received/{userId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getMessagesForUser(@HeaderParam("token") String token, @PathParam("userId") int userId) {
-        if (!userBean.tokenExist(token)) {
-            return Response.status(401).entity("Invalid token").build();
-        }
-        ArrayList<MessageDto> messages = messageBean.getReceivedUserMessages(userId);
-        return Response.status(200).entity(messages).build();
-    }
-
-    // Endpoint to get messages from a user (Sent)
-    @GET
-    @Path("/sent/{userId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getMessagesFromUser(@HeaderParam("token") String token, @PathParam("userId") int userId) {
-        if (!userBean.tokenExist(token)) {
-            return Response.status(401).entity("Invalid token").build();
-        }
-        ArrayList<MessageDto> messages = messageBean.getSentUserMessages(userId);
-        return Response.status(200).entity(messages).build();
-    }
 
     // Endpoint to get chat messages
     @GET

@@ -10,9 +10,6 @@ import java.io.Serializable;
 @Entity
 @Table(name = "message")
 @NamedQuery(name = "Message.findById", query = "SELECT m FROM MessageEntity m WHERE m.id = :messageId")
-@NamedQuery(name = "Message.findMessagesForUser", query = "SELECT m FROM MessageEntity m WHERE m.receiver = :user ORDER BY m.sentTime")
-@NamedQuery(name = "Message.findMessagesFromUser", query = "SELECT m FROM MessageEntity m WHERE m.sender = :user ORDER BY m.sentTime")
-@NamedQuery(name = "Message.findAllUserMessages", query = "SELECT m FROM MessageEntity m WHERE m.sender = :user OR m.receiver = :user ORDER BY m.sentTime")
 @NamedQuery(name = "Message.findPreviousChatMessages", query = "SELECT m FROM MessageEntity m WHERE ((m.sender.id = :senderId AND m.receiver.id = :receiverId) OR (m.sender.id = :receiverId AND m.receiver.id = :senderId)) AND m.sentTime <= :sentTime")
 @NamedQuery(name = "Message.findChangedMessages", query = "SELECT m FROM MessageEntity m WHERE ( m.sender.id = :senderId AND m.receiver.id = :receiverId) OR (m.sender.id = :receiverId AND m.receiver.id = :senderId) ORDER BY m.sentTime")
 

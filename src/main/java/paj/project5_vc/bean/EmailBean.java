@@ -21,7 +21,7 @@ public class EmailBean implements Serializable {
 
     // old pass: Aor1904Qq
 
-    public static void sendConfirmationEmail(String recipientEmail, String token) {
+    public void sendConfirmationEmail(String recipientEmail, String token) {
         // Sender's email configuration
         String from = "aor.scrum.board@gmail.com";
         // Set properties
@@ -57,7 +57,7 @@ public class EmailBean implements Serializable {
         }
     }
 
-    public static void sendResetPasswordEmail(String recipientEmail, String token) {
+    public void sendResetPasswordEmail(String recipientEmail, String token) {
         // Sender's email configuration
         String from = "aor.scrum.board@gmail.com";
         // Set properties

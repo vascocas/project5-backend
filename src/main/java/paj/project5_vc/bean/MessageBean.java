@@ -3,23 +3,17 @@ package paj.project5_vc.bean;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import paj.project5_vc.dao.MessageDao;
 import paj.project5_vc.dao.NotificationDao;
 import paj.project5_vc.dao.UserDao;
 import paj.project5_vc.dto.MessageDto;
-import paj.project5_vc.dto.NotificationDto;
 import paj.project5_vc.entity.MessageEntity;
 import paj.project5_vc.entity.NotificationEntity;
 import paj.project5_vc.entity.UserEntity;
-import paj.project5_vc.websocket.MessageWeb;
-import paj.project5_vc.websocket.NotificationWeb;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Stateless
 public class MessageBean implements Serializable {
@@ -33,7 +27,6 @@ public class MessageBean implements Serializable {
     @EJB
     UserDao userDao;
 
-
     // Method for sending a message
     public boolean sendMessage(MessageDto messageDto) {
         UserEntity sender = userDao.findUserById(messageDto.getSenderId());
@@ -46,8 +39,7 @@ public class MessageBean implements Serializable {
             message.setSender(sender);
             message.setReceiver(receiver);
             messageDao.persist(message);
-
-            // Create and persist notification
+            // Create and persist notification only if the receiver isn't on chat page
             NotificationEntity notif = new NotificationEntity();
             notif.setContentText("New message from: " + sender.getUsername());
             notif.setReadStatus(false);
@@ -61,68 +53,20 @@ public class MessageBean implements Serializable {
     // Method for marking a message as read
     public boolean markMessageAsRead(MessageDto message) {
         MessageEntity messageEntity = messageDao.findById(message.getId());
-            if (messageEntity != null) {
-                int senderId = messageEntity.getSender().getId();
-                int receiverId = messageEntity.getReceiver().getId();
-                ArrayList<MessageEntity> previousMessages = messageDao.findPreviousChatMessages(senderId, receiverId, messageEntity.getSentTime());
-                // Mark all previous messages as read
-                for (MessageEntity prevMessage : previousMessages) {
-                    if(prevMessage.getReceiver().getId() == messageEntity.getReceiver().getId()) {
-                        prevMessage.setReadStatus(true);
-                    }
+        if (messageEntity != null) {
+            int senderId = messageEntity.getSender().getId();
+            int receiverId = messageEntity.getReceiver().getId();
+            ArrayList<MessageEntity> previousMessages = messageDao.findPreviousChatMessages(senderId, receiverId, messageEntity.getSentTime());
+            // Mark all previous messages as read
+            for (MessageEntity prevMessage : previousMessages) {
+                if (prevMessage.getReceiver().getId() == messageEntity.getReceiver().getId()) {
+                    prevMessage.setReadStatus(true);
                 }
-                logger.warn("Messages marked as read");
-                return true;
             }
+            logger.warn("Messages marked as read");
+            return true;
+        }
         return false;
-    }
-
-    // Method for fetching messages for a user
-    public ArrayList<MessageDto> getReceivedUserMessages(int userId) {
-        // Retrieve the user entity corresponding to the userId
-        UserEntity user = userDao.findUserById(userId);
-        if (user != null) {
-            // Retrieve messages for the user from the database
-            ArrayList<MessageEntity> messageEntities = messageDao.findMessagesForUser(user);
-            // Convert MessageEntity objects to MessageDto objects
-            ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);
-            return messages;
-        } else {
-            // If user is not found, return an empty list
-            return new ArrayList<>();
-        }
-    }
-
-    // Method for fetching messages from a user
-    public ArrayList<MessageDto> getSentUserMessages(int userId) {
-        // Retrieve the user entity corresponding to the userId
-        UserEntity user = userDao.findUserById(userId);
-        if (user != null) {
-            // Retrieve messages for the user from the database
-            ArrayList<MessageEntity> messageEntities = messageDao.findMessagesFromUser(user);
-            // Convert MessageEntity objects to MessageDto objects
-            ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);
-            return messages;
-        } else {
-            // If user is not found, return an empty list
-            return new ArrayList<>();
-        }
-    }
-
-    // Method for fetching messages all user messages
-    public ArrayList<MessageDto> getAllUserMessages(int userId) {
-        // Retrieve the user entity corresponding to the userId
-        UserEntity user = userDao.findUserById(userId);
-        if (user != null) {
-            // Retrieve messages for the user from the database
-            ArrayList<MessageEntity> messageEntities = messageDao.findAllUserMessages(user);
-            // Convert MessageEntity objects to MessageDto objects
-            ArrayList<MessageDto> messages = convertMessagesFromEntityListToDtoList(messageEntities);
-            return messages;
-        } else {
-            // If user is not found, return an empty list
-            return new ArrayList<>();
-        }
     }
 
     // Method for fetching chat messages

@@ -10,19 +10,21 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 @Singleton
 @ServerEndpoint("/websocket/task/{token}")
 public class TaskWeb {
     private static final Logger logger = LogManager.getLogger(TaskWeb.class);
-    HashMap<String, Session> sessions = new HashMap<>();
+    HashMap<String, Session> taskSessions = new HashMap<>();
 
 
     public void taskChange(String token, String taskAction) {
-        Session ownSession = sessions.get(token);
+        Session ownSession = taskSessions.get(token);
         // Iterate over all sessions
-        for (Session s : sessions.values()) {
+        for (Session s : taskSessions.values()) {
             try {
                 if(s!=ownSession) {
                     if (s.isOpen()) {
@@ -39,16 +41,20 @@ public class TaskWeb {
     @OnOpen
     public void toDoOnOpen(Session session, @PathParam("token") String token) {
         logger.info("A new WebSocket session is opened for client");
-        sessions.put(token, session);
+        taskSessions.put(token, session);
     }
 
     @OnClose
     public void toDoOnClose(Session session, CloseReason reason) {
         logger.info("Websocket session is closed with CloseCode: " +
                 reason.getCloseCode() + ": " + reason.getReasonPhrase());
-        for (String key : sessions.keySet()) {
-            if (sessions.get(key) == session)
-                sessions.remove(key);
+        // Create an iterator to safely remove elements
+        Iterator<Map.Entry<String, Session>> iterator = taskSessions.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Session> entry = iterator.next();
+            if (entry.getValue().equals(session)) {
+                iterator.remove(); // Safely remove the entry using the iterator
+            }
         }
     }
 
